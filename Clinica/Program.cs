@@ -23,13 +23,34 @@ builder.Services.AddScoped(sp =>
 builder.Services
     .AddDefaultIdentity<IdentityUser>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = false;
+
+
+        //password
         options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 4;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+
+        // SignIn
+        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedEmail = false;
+        options.SignIn.RequireConfirmedPhoneNumber = false;
+
+        //User
+        options.User.RequireUniqueEmail = true;
+
 
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<TurnosDbContext>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(120);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
 builder.Services.AddScoped<TurnosApiClient>();
 
