@@ -1,6 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using TurnosClinica.Components;
+using TurnosClinica.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<TurnosDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TurnosDbContext")));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
