@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TurnosClinica.Models;
 
-namespace TurnosClinica.Configuracion
+namespace TurnosClinica.Infrastructure.Configuracion
 {
     public class MedicamentoConfig : IEntityTypeConfiguration<Medicamento>
     {

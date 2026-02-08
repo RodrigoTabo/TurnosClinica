@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TurnosClinica.Models;
 
-namespace TurnosClinica.Data
+namespace TurnosClinica.Infrastructure.Data
 {
     public class TurnosDbContext : DbContext
     {

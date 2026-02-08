@@ -1,15 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TurnosClinica.Models;
 
-namespace TurnosClinica.Configuracion
+namespace TurnosClinica.Infrastructure.Configuracion
 {
-    public class EspecialidadConfig : IEntityTypeConfiguration<Especialidad> 
+    public class PagoMetodoConfig : IEntityTypeConfiguration<PagoMetodo>
     {
 
-
-        public void Configure(EntityTypeBuilder<Especialidad> b)
+        public void Configure(EntityTypeBuilder<PagoMetodo> b)
         {
 
             b.HasKey(x => x.Id);

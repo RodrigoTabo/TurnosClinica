@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using TurnosClinica.Application.Services;
 using TurnosClinica.Components;
-using TurnosClinica.Data;
+using TurnosClinica.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<TurnosDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TurnosDbContext")));
+builder.Services.AddScoped<ITurnosService, TurnosService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -27,5 +29,6 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 
 app.Run();
