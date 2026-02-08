@@ -1,0 +1,89 @@
+﻿@page "/turnos"
+@using TurnosClinica.ApiClients
+@using TurnosClinica.Application.DTOs
+@inject TurnosApiClient Api
+
+<h3>Turnos</h3>
+
+<div class="d-flex gap-2 align-items-end mb-3">
+    <div>
+        <label class="form-label">Desde</label>
+        <input class="form-control" type="datetime-local" @bind="DesdeLocal" />
+    </div>
+    <div>
+        <label class="form-label">Hasta</label>
+        <input class="form-control" type="datetime-local" @bind="HastaLocal" />
+    </div>
+    <button class="btn btn-primary" @onclick="Cargar">Buscar</button>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+@if (Cargando)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Paciente</th>
+                <th>Médico</th>
+                <th>Estado</th>
+                <th>Consultorio</th>
+                <th>Pago</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Turnos)
+            {
+                <tr>
+                    <td>@t.FechaTurno.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@t.PacienteNombreCompleto</td>
+                    <td>@t.MedicoNombreCompleto</td>
+                    <td>@t.Estado</td>
+                    <td>@t.Consultorio</td>
+                    <td>@(t.TienePago ? "Sí" : "No")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<TurnoResponse> Turnos = new();
+    private bool Cargando;
+    private string? Error;
+
+    // datetime-local usa local time; lo convertimos a DateTime
+    private DateTime DesdeLocal = DateTime.Today;
+    private DateTime HastaLocal = DateTime.Today.AddDays(1);
+
+    private async Task Cargar()
+    {
+        Error = null;
+        Cargando = true;
+        try
+        {
+            Turnos = await Api.ListarAsync(DesdeLocal, HastaLocal);
+        }
+        catch (TurnosApiException ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+}

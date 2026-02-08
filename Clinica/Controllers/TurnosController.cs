@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TurnosClinica.Application.DTOs;
+using TurnosClinica.Application.Exceptions;
 using TurnosClinica.Application.Services;
 using TurnosClinica.Models;
 
@@ -8,12 +9,12 @@ namespace TurnosClinica.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class TurnoController : ControllerBase
+    public class TurnosController : ControllerBase
     {
 
         private readonly ITurnosService _service;
 
-        public TurnoController(ITurnosService service)
+        public TurnosController(ITurnosService service)
         {
             _service = service;
         }
@@ -25,8 +26,19 @@ namespace TurnosClinica.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CrearTurnoRequest request)
         {
-            var id = await _service.CrearAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id }, null);
+            try
+            {
+                var id = await _service.CrearAsync(request);
+                return Created($"/api/turnos/{id}", new { id });
+            }
+            catch (NotFoundAppException ex)
+            {
+                return NotFound(Problem(title: ex.Message, statusCode: 404));
+            }
+            catch (ConflictAppException ex)
+            {
+                return Conflict(Problem(title: ex.Message, statusCode: 409));
+            }
         }
 
         [HttpGet("{id:int}")]

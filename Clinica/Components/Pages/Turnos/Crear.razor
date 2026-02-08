@@ -1,0 +1,86 @@
+﻿@page "/turnos/crear"
+@using TurnosClinica.ApiClients
+@using TurnosClinica.Application.DTOs
+@inject TurnosApiClient Api
+@inject NavigationManager Nav
+
+<h3>Crear turno</h3>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">PacienteId (Guid)</label>
+    <input class="form-control" @bind="Model.PacienteIdText" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">MedicoId (int)</label>
+    <input class="form-control" type="number" @bind="Model.MedicoId" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">ConsultorioId (int)</label>
+    <input class="form-control" type="number" @bind="Model.ConsultorioId" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Fecha y hora</label>
+    <input class="form-control" type="datetime-local" @bind="Model.FechaLocal" />
+</div>
+
+<button class="btn btn-success" @onclick="Crearx" disabled="@Guardando">
+    @(Guardando ? "Guardando..." : "Crear")
+</button>
+
+@code {
+    private string? Error;
+    private bool Guardando;
+
+    private CrearTurnoVm Model = new();
+
+    private async Task Crearx()
+    {
+        Error = null;
+        Guardando = true;
+
+        try
+        {
+            if (!Guid.TryParse(Model.PacienteIdText, out var pacienteId))
+            {
+                Error = "PacienteId inválido.";
+                return;
+            }
+
+            var req = new CrearTurnoRequest
+            {
+                PacienteId = pacienteId,
+                MedicoId = Model.MedicoId,
+                ConsultorioId = Model.ConsultorioId,
+                FechaTurno = Model.FechaLocal
+            };
+
+            await Api.CrearAsync(req);
+
+            Nav.NavigateTo("/turnos");
+        }
+        catch (TurnosApiException ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+    private class CrearTurnoVm
+    {
+        public string PacienteIdText { get; set; } = "";
+        public int MedicoId { get; set; }
+        public int ConsultorioId { get; set; }
+        public DateTime FechaLocal { get; set; } = DateTime.Now;
+    }
+}
