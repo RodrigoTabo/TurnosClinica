@@ -31,7 +31,7 @@
     <input class="form-control" type="datetime-local" @bind="Model.FechaLocal" />
 </div>
 
-<button class="btn btn-success" @onclick="Crearx" disabled="@Guardando">
+<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
     @(Guardando ? "Guardando..." : "Crear")
 </button>
 
@@ -41,7 +41,7 @@
 
     private CrearTurnoVm Model = new();
 
-    private async Task Crearx()
+    private async Task Create()
     {
         Error = null;
         Guardando = true;

@@ -17,6 +17,10 @@
     <button class="btn btn-primary" @onclick="Cargar">Buscar</button>
 </div>
 
+<NavLink class="btn btn-success mb-3" href="/turnos/crear">
+    Nuevo turno
+</NavLink>
+
 @if (!string.IsNullOrWhiteSpace(Error))
 {
     <div class="alert alert-danger">@Error</div>

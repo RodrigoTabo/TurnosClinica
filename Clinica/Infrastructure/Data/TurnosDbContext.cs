@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TurnosClinica.Models;
 
 namespace TurnosClinica.Infrastructure.Data
 {
-    public class TurnosDbContext : DbContext
+    public class TurnosDbContext : IdentityDbContext
     {
         public TurnosDbContext(DbContextOptions<TurnosDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
