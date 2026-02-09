@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Nav
+
+<AuthorizeView>
+    <Authorized Context="auth">
+        <span class="me-2">Hola, @auth.User.Identity?.Name!</span>
+
+        <form method="post" action="Identity/Account/Logout" class="d-inline">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="@Nav.Uri" />
+            <button type="submit" class="btn btn-link p-0">Salir</button>
+        </form>
+    </Authorized>
+
+    <NotAuthorized>
+        <a class="nav-link d-inline me-2" href="/login">Login</a>
+        <a class="nav-link d-inline href=" href="/register">Register</a>
+    </NotAuthorized>
+</AuthorizeView>

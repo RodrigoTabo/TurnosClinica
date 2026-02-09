@@ -1,4 +1,5 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">TurnosClinica</a>
     </div>
@@ -30,6 +31,28 @@
                 <span class="bi bi-calendar-check" aria-hidden="true"></span> Turnos
             </NavLink>
         </div>
+
+        <div class="nav-item px-3">
+            <ul class="nav flex-column">
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="/logout">Logout</NavLink>
+                        </li>
+                    </Authorized>
+
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="/login">Login</NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="/register">Register</NavLink>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </ul>
+        </div>
+
     </nav>
 </div>
 

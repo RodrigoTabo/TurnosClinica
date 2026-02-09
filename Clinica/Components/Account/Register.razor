@@ -1,0 +1,75 @@
+﻿@page "/register"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+<h3>Register</h3>
+
+<EditForm Model="Model" OnValidSubmit="OnRegister" FormName="registerForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-2">
+        <label class="form-label">Email</label>
+        <InputText class="form-control" @bind-Value="Model.Email" />
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label">Password</label>
+        <InputText class="form-control" type="password" @bind-Value="Model.Password" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Confirmar Password</label>
+        <InputText class="form-control" type="password" @bind-Value="Model.ConfirmPassword" />
+    </div>
+
+    <button class="btn btn-success" type="submit" disabled="@_busy">Crear cuenta</button>
+</EditForm>
+
+@if (!string.IsNullOrWhiteSpace(_error))
+{
+    <div class="alert alert-danger mt-3">@_error</div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    public RegisterModel Model { get; set; } = new();
+
+    private string? _error;
+    private bool _busy;
+
+    private async Task OnRegister()
+    {
+        _busy = true;
+        _error = null;
+
+        var user = new IdentityUser { UserName = Model.Email, Email = Model.Email };
+        var create = await UserManager.CreateAsync(user, Model.Password);
+
+        if (!create.Succeeded)
+        {
+            _busy = false;
+            _error = string.Join(" | ", create.Errors.Select(e => e.Description));
+            return;
+        }
+
+        await SignInManager.SignInAsync(user, isPersistent: true);
+
+        HttpContextAccessor.HttpContext?.Response.Redirect("/");
+    }
+
+    public sealed class RegisterModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required, MinLength(4)]
+        public string Password { get; set; } = "";
+
+        [Required, Compare(nameof(Password), ErrorMessage = "Las contraseñas no coinciden.")]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

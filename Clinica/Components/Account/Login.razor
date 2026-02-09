@@ -1,0 +1,78 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+<h3>Login</h3>
+
+<EditForm Model="Model" OnValidSubmit="OnLogin" FormName="loginForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-2">
+        <label class="form-label">Email</label>
+        <InputText class="form-control" @bind-Value="Model.Email" />
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label">Password</label>
+        <InputText class="form-control" type="password" @bind-Value="Model.Password" />
+    </div>
+
+    <div class="form-check mb-3">
+        <InputCheckbox class="form-check-input" @bind-Value="Model.RememberMe" />
+        <label class="form-check-label">Recordarme</label>
+    </div>
+
+    <button class="btn btn-primary" type="submit" disabled="@_busy">Entrar</button>
+</EditForm>
+
+@if (!string.IsNullOrWhiteSpace(_error))
+{
+    <div class="alert alert-danger mt-3">@_error</div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    public LoginModel Model { get; set; } = new();
+
+    private string? _error;
+    private bool _busy;
+
+    [SupplyParameterFromQuery] public string? returnUrl { get; set; }
+
+    private async Task OnLogin()
+    {
+        _busy = true;
+        _error = null;
+
+        var result = await SignInManager.PasswordSignInAsync(
+            userName: Model.Email,
+            password: Model.Password,
+            isPersistent: Model.RememberMe,
+            lockoutOnFailure: true);
+
+        _busy = false;
+
+        if (result.Succeeded)
+        {
+            var to = string.IsNullOrWhiteSpace(returnUrl) ? "/" : returnUrl!;
+            HttpContextAccessor.HttpContext?.Response.Redirect(to);
+            return;
+        }
+
+        _error = result.IsLockedOut ? "Usuario bloqueado temporalmente." : "Credenciales inválidas.";
+    }
+
+    public sealed class LoginModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        public string Password { get; set; } = "";
+
+        public bool RememberMe { get; set; } = true;
+    }
+}
