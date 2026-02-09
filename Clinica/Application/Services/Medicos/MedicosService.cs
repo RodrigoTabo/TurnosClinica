@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TurnosClinica.Application.DTOs.Medicos;
 using TurnosClinica.Infrastructure.Data;
+using TurnosClinica.Models;
 
 namespace TurnosClinica.Application.Services.Medicos
 {
@@ -13,10 +14,31 @@ namespace TurnosClinica.Application.Services.Medicos
             _context = context;
         }
 
-        public Task<int> CrearAsync(CrearMedicoRequest request)
+        public async Task<int> CrearAsync(CrearMedicoRequest request)
         {
-            //falta implementar la logica.
-            throw new NotImplementedException();
+            //Validamos especialidad
+            var especialidad = _context.Especialidades.Any(e => e.Id == request.EspecialidadId);
+            if (!especialidad)
+                throw new KeyNotFoundException("La especialidad no existe.");
+
+            //Validamos choque
+            var dni = _context.Medicos.Any(m => m.DNI == request.DNI);
+            if (dni)
+                throw new InvalidOperationException("El medico ya esta registrado");
+
+            var medico = new Medico
+            {
+                Id = request.Id,
+                Nombre = request.Nombre,
+                Apellido = request.Apellido,
+                DNI = request.DNI,
+                EspecialidadId = request.EspecialidadId
+            };
+
+            _context.Medicos.Add(medico);
+            await _context.SaveChangesAsync();
+
+            return medico.Id;
         }
 
         public async Task<List<MedicoResponse>> ListarAsync()

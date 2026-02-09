@@ -9,6 +9,5 @@ namespace TurnosClinica.Application.DTOs.Medicos
         public string Apellido { get; set; }
         public int DNI { get; set; }
         public int EspecialidadId { get; set; }
-        public Especialidad Especialidad { get; set; }
     }
 }

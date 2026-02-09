@@ -1,7 +1,9 @@
 ﻿namespace TurnosClinica.ApiClients.Medicos
 {
-    using TurnosClinica.Application.DTOs.Medicos;
     using System.Net.Http.Json;
+    using TurnosClinica.ApiClients.Turnos;
+    using TurnosClinica.Application.DTOs.Medicos;
+
     public class MedicosApiClient
     {
         private readonly HttpClient _Http;
@@ -19,6 +21,26 @@
             return result ?? new List<MedicoResponse>();
         }
 
+
+        public async Task<int> CrearAsync(CrearMedicoRequest request)
+        {
+            var resp = await _Http.PostAsJsonAsync("api/medicos", request);
+
+
+            if (resp.IsSuccessStatusCode)
+            {
+                var created = await resp.Content.ReadFromJsonAsync<CreatedIdResponse>();
+                return created?.Id ?? 0;
+            }
+
+            throw await TurnosApiException.FromHttpResponse(resp);
+
+        }
+
+        private class CreatedIdResponse
+        {
+            public int Id { get; set; }
+        }
 
     }
 }

@@ -19,7 +19,6 @@ namespace TurnosClinica.Infrastructure.Configuracion
 
             b.HasIndex(x => x.DNI).IsUnique();
 
-            b.HasIndex(x => x.EspecialidadId).IsUnique();
 
             b.HasOne(x => x.Especialidad)
                 .WithMany(x => x.Medicos)

@@ -8,7 +8,6 @@ namespace TurnosClinica.Infrastructure.Configuracion
     public class EspecialidadConfig : IEntityTypeConfiguration<Especialidad> 
     {
 
-
         public void Configure(EntityTypeBuilder<Especialidad> b)
         {
 

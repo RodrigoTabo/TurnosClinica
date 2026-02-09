@@ -1,0 +1,152 @@
+﻿@page "/medicos/crear"
+@rendermode InteractiveServer
+@using TurnosClinica.ApiClients
+@using TurnosClinica.ApiClients.Medicos
+@using TurnosClinica.ApiClients.Especialidades
+@using TurnosClinica.Application.DTOs
+@using TurnosClinica.Application.DTOs.Medicos
+@using TurnosClinica.Application.DTOs.Especialidades
+@inject MedicosApiClient Api
+@inject EspecialidadesApiClient EspecialidadesApi
+@inject NavigationManager Nav
+
+
+<h3>Ingresar nuevo medico.</h3>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" @bind="Model.Nombre" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Apellido</label>
+    <input class="form-control" @bind="Model.Apellido" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">DNI</label>
+    <input class="form-control" type="number" @bind="Model.DNI" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Especialidad</label>
+
+    @if (CargandoEspecialidades)
+    {
+        <div class="form-text">Cargando especialidades...</div>
+    }
+    else
+    {
+        <select class="form-select" @bind="Model.EspecialidadId">
+            <option value="0" disabled>-- Seleccioná una especialidad --</option>
+
+            @foreach (var e in Especialidades)
+            {
+                <option value="@e.Id">@e.Nombre</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrWhiteSpace(ErrorEspecialidades))
+        {
+            <div class="text-danger mt-1">@ErrorEspecialidades</div>
+        }
+    }
+</div>
+
+<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
+    @(Guardando ? "Guardando..." : "Crear")
+</button>
+
+@code {
+    private string? Error;
+    private bool Guardando;
+
+    private bool CargandoEspecialidades = true;
+    private string? ErrorEspecialidades;
+
+    private CrearMedicoVM Model = new() { EspecialidadId = 0 };
+    private List<ItemEspecialidad> Especialidades = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarEspecialidades();
+    }
+
+    private async Task CargarEspecialidades()
+    {
+        CargandoEspecialidades = true;
+        ErrorEspecialidades = null;
+
+        try
+        {
+            // Ajustá esto a tu método real:
+            // - A veces es Api.ListarAsync()
+            // - A veces devuelve DTOs con Id/Nombre
+            var lista = await EspecialidadesApi.ListarAsync();
+
+            Especialidades = lista
+                .Select(x => new ItemEspecialidad(x.Id, x.Nombre))
+                .OrderBy(x => x.Nombre)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorEspecialidades = ex.Message;
+            Especialidades = new();
+        }
+        finally
+        {
+            CargandoEspecialidades = false;
+        }
+    }
+
+    private async Task Create()
+    {
+        Error = null;
+
+        if (Model.EspecialidadId <= 0)
+        {
+            Error = "Seleccioná una especialidad.";
+            return;
+        }
+
+        Guardando = true;
+
+        try
+        {
+            var req = new CrearMedicoRequest
+            {
+                Nombre = Model.Nombre,
+                Apellido = Model.Apellido,
+                DNI = Model.DNI,
+                EspecialidadId = Model.EspecialidadId
+            };
+
+            await Api.CrearAsync(req);
+            Nav.NavigateTo("/medicos");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+    private class CrearMedicoVM
+    {
+        public string Nombre { get; set; } = "";
+        public string Apellido { get; set; } = "";
+        public int DNI { get; set; }
+        public int EspecialidadId { get; set; }
+    }
+
+    private record ItemEspecialidad(int Id, string Nombre);
+}
