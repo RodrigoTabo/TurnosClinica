@@ -6,8 +6,11 @@ using TurnosClinica.Components;
 using TurnosClinica.Infrastructure.Data;
 using TurnosClinica.Application.Services.Turnos;
 using TurnosClinica.Application.Services.Medicos;
+using TurnosClinica.Application.Services.Especialidades;
 using TurnosClinica.ApiClients.Turnos;
 using TurnosClinica.ApiClients.Medicos;
+using TurnosClinica.ApiClients.Especialidades;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,8 @@ builder.Services.AddDbContext<TurnosDbContext>(options =>
 //CONTEXTOS SERVICES.
 builder.Services.AddScoped<ITurnosService, TurnosService>();
 builder.Services.AddScoped<IMedicosService, MedicosService>();
+builder.Services.AddScoped<IEspecialidadesService, EspecialidadesService>();
+
 
 
 builder.Services.AddScoped(sp =>
@@ -29,6 +34,8 @@ builder.Services.AddScoped(sp =>
 
 builder.Services.AddScoped<TurnosApiClient>();
 builder.Services.AddScoped<MedicosApiClient>();
+builder.Services.AddScoped<EspecialidadesApiClient>();
+
 
 
 builder.Services

@@ -1,0 +1,63 @@
+﻿@page "/especialidades/crear"
+@rendermode InteractiveServer
+@using TurnosClinica.ApiClients
+@using TurnosClinica.ApiClients.Especialidades
+@using TurnosClinica.Application.DTOs
+@using TurnosClinica.Application.DTOs.Especialidades
+@inject EspecialidadesApiClient Api
+@inject NavigationManager Nav
+
+<h3>Crear especialidad</h3>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" @bind="Model.Nombre" />
+</div>
+
+<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
+    @(Guardando ? "Guardando..." : "Crear")
+</button>
+
+@code {
+    private string? Error;
+    private bool Guardando;
+
+    private CrearEspecialidadVM Model = new();
+
+    private async Task Create()
+    {
+        Error = null;
+        Guardando = true;
+        try
+        {
+            var req = new CrearEspecialidadRequest
+            {
+                Nombre = Model.Nombre,
+            };
+
+            await Api.CrearAsync(req);
+            Nav.NavigateTo("/especialidades");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+
+    }
+
+
+    private class CrearEspecialidadVM
+    {
+        public string Nombre { get; set; } = "";
+    }
+
+}

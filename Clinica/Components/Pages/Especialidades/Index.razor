@@ -1,0 +1,69 @@
+﻿@page "/especialidades"
+@using TurnosClinica.ApiClients
+@using TurnosClinica.ApiClients.Especialidades
+@using TurnosClinica.Application.DTOs
+@using TurnosClinica.Application.DTOs.Especialidades
+@inject EspecialidadesApiClient Api
+
+<h3>Lista de medicos</h3>
+
+
+<NavLink class="btn btn-success mb-3" href="/especialidades/crear">
+    Nueva especialidad
+</NavLink>
+
+@if (!string.IsNullOrEmpty(Error))
+{
+    <h3>Cargando...</h3>
+}else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Especialidades)
+            {
+                <tr>
+                    <td>@e.Nombre</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+
+    private List<EspecialidadResponse> Especialidades = new();
+    private bool Cargando;
+    private string? Error;
+
+    private async Task Cargar()
+    {
+        Error = null;
+        Cargando = true;
+
+        try
+        {
+            Especialidades = await Api.ListarAsync();
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Cargando = false;
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+}

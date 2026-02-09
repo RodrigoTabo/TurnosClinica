@@ -65,7 +65,7 @@ namespace TurnosClinica.Application.Services.Turnos
             t.FechaTurno == request.FechaTurno);
 
             if (existeChoquePaciente)
-                throw new InvalidOperationException("El consultorio ya esta ocupado en ese horario.");
+                throw new InvalidOperationException("El paciente ya tiene un turno en ese horario.");
 
 
             var turno = new Turno
