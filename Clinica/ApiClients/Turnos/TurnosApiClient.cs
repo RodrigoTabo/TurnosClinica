@@ -1,8 +1,7 @@
-﻿namespace TurnosClinica.ApiClients
+﻿namespace TurnosClinica.ApiClients.Turnos
 {
-    using System.Net;
     using System.Net.Http.Json;
-    using TurnosClinica.Application.DTOs;
+    using TurnosClinica.Application.DTOs.Turnos;
 
     public class TurnosApiClient
     {

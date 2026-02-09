@@ -1,7 +1,7 @@
-﻿using TurnosClinica.Application.DTOs;
+﻿using TurnosClinica.Application.DTOs.Turnos;
 using TurnosClinica.Models;
 
-namespace TurnosClinica.Application.Services
+namespace TurnosClinica.Application.Services.Turnos
 {
     public interface ITurnosService
     {

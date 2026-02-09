@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using TurnosClinica.ApiClients;
-using TurnosClinica.Application.Services;
 using TurnosClinica.Components;
 using TurnosClinica.Infrastructure.Data;
+using TurnosClinica.Application.Services.Turnos;
+using TurnosClinica.Application.Services.Medicos;
+using TurnosClinica.ApiClients.Turnos;
+using TurnosClinica.ApiClients.Medicos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,10 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<TurnosDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TurnosDbContext")));
 
+//CONTEXTOS SERVICES.
 builder.Services.AddScoped<ITurnosService, TurnosService>();
+builder.Services.AddScoped<IMedicosService, MedicosService>();
+
 
 builder.Services.AddScoped(sp =>
 {
@@ -23,6 +28,8 @@ builder.Services.AddScoped(sp =>
 });
 
 builder.Services.AddScoped<TurnosApiClient>();
+builder.Services.AddScoped<MedicosApiClient>();
+
 
 builder.Services
     .AddIdentityCore<IdentityUser>(options =>

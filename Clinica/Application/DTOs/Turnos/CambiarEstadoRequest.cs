@@ -1,4 +1,4 @@
-﻿namespace TurnosClinica.Application.DTOs
+﻿namespace TurnosClinica.Application.DTOs.Turnos
 {
     public class CambiarEstadoRequest
     {

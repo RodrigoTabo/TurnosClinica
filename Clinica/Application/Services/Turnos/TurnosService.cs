@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using TurnosClinica.Application.DTOs;
+using TurnosClinica.Application.DTOs.Turnos;
 using TurnosClinica.Infrastructure.Data;
 using TurnosClinica.Models;
 
-namespace TurnosClinica.Application.Services
+namespace TurnosClinica.Application.Services.Turnos
 {
     public class TurnosService : ITurnosService
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TurnosClinica.Application.DTOs;
+using TurnosClinica.Application.DTOs.Turnos;
 using TurnosClinica.Application.Exceptions;
-using TurnosClinica.Application.Services;
+using TurnosClinica.Application.Services.Turnos;
 using TurnosClinica.Models;
 
 namespace TurnosClinica.Controllers

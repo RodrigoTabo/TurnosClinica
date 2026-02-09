@@ -1,0 +1,71 @@
+﻿@page "/medicos"
+@using TurnosClinica.ApiClients
+@using TurnosClinica.ApiClients.Medicos
+@using TurnosClinica.Application.DTOs
+@using TurnosClinica.Application.DTOs.Medicos
+@inject MedicosApiClient Api
+
+<h3>Lista de medicos</h3>
+
+
+@if (!string.IsNullOrEmpty(Error))
+{
+    <h3>Cargando...</h3>
+}else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>DNI</th>
+                <th>Especialidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in Medicos)
+            {
+                <tr>
+                    <td>@m.Nombre</td>
+                    <td>@m.Apellido</td>
+                    <td>@m.DNI</td>
+                    <td>@m.Especialidad</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+
+    private List<MedicoResponse> Medicos = new();
+    private bool Cargando;
+    private string? Error;
+
+    private async Task Cargar()
+    {
+        Error = null;
+        Cargando = true;
+
+        try
+        {
+            Medicos = await Api.ListarAsync();
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Cargando = false;
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+}
