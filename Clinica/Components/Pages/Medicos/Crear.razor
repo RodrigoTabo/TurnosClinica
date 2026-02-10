@@ -1,9 +1,7 @@
 ﻿@page "/medicos/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients
 @using TurnosClinica.ApiClients.Medicos
 @using TurnosClinica.ApiClients.Especialidades
-@using TurnosClinica.Application.DTOs
 @using TurnosClinica.Application.DTOs.Medicos
 @using TurnosClinica.Application.DTOs.Especialidades
 @inject MedicosApiClient Api
@@ -84,9 +82,6 @@
 
         try
         {
-            // Ajustá esto a tu método real:
-            // - A veces es Api.ListarAsync()
-            // - A veces devuelve DTOs con Id/Nombre
             var lista = await EspecialidadesApi.ListarAsync();
 
             Especialidades = lista

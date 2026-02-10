@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace TurnosClinica.Models
+﻿namespace TurnosClinica.Models
 {
     public class Paciente
     {

@@ -1,5 +1,4 @@
-﻿using TurnosClinica.Models;
-
+﻿
 namespace TurnosClinica.Application.DTOs.Medicos
 {
     public class CrearMedicoRequest

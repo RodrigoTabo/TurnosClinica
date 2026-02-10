@@ -1,58 +1,52 @@
-﻿@page "/medicos"
-@using TurnosClinica.ApiClients.Medicos
-@using TurnosClinica.Application.DTOs.Medicos
-@inject MedicosApiClient Api
+﻿@page "/paises"
+@using TurnosClinica.Application.DTOs.Paises
+@using TurnosClinica.ApiClients.Paises
+@inject PaisesApiClient Api
 
-<h3>Lista de medicos</h3>
+<h3>Lista de paises</h3>
 
-<NavLink class="btn btn-success mb-3" href="/medicos/crear">
-    Agregar nuevo medico
+
+<NavLink class="btn btn-success mb-3" href="/paises/crear">
+    Agregar nuevo Pais
 </NavLink>
 
 
 @if (!string.IsNullOrEmpty(Error))
 {
     <h3>Cargando...</h3>
-}else
+}
+else
 {
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Apellido</th>
-                <th>DNI</th>
-                <th>Especialidad</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var m in Medicos)
+            @foreach (var p in Paises)
             {
                 <tr>
-                    <td>@m.Nombre</td>
-                    <td>@m.Apellido</td>
-                    <td>@m.DNI</td>
-                    <td>@m.Especialidad</td>
+                    <td>@p.Nombre</td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
-
-@code {
-
-    private List<MedicoResponse> Medicos = new();
+@code{
+    private List<PaisResponse> Paises = new();
     private bool Cargando;
     private string? Error;
 
     private async Task Cargar()
     {
-        Error = null;
         Cargando = true;
+        Error = null;
 
         try
         {
-            Medicos = await Api.ListarAsync();
+            Paises = await Api.ListarAsync();
         }
         catch (Exception ex)
         {
@@ -65,6 +59,7 @@
 
     }
 
+    //Inicializa la carga siempre.
     protected override async Task OnInitializedAsync()
     {
         await Cargar();

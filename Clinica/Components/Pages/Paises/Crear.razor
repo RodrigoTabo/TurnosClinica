@@ -1,0 +1,64 @@
+﻿@page "/paises/crear"
+@rendermode InteractiveServer
+@using TurnosClinica.ApiClients.Paises
+@using TurnosClinica.Application.DTOs.Paises
+@inject PaisesApiClient Api
+@inject NavigationManager Nav
+
+
+<h3>Crear Pais</h3>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" @bind="Model.Nombre" />
+</div>
+
+<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
+    @(Guardando ? "Guardando..." : "Crear")
+</button>
+
+@code {
+
+    private string? Error;
+    private bool Guardando;
+
+    private CrearPaisVM Model = new();
+
+    private async Task Create()
+    {
+        Error = null;
+        Guardando = true;
+
+        try
+        {
+            var req = new CrearPaisRequest
+            {
+                Nombre = Model.Nombre
+            };
+
+            await Api.CrearAsync(req);
+            Nav.NavigateTo("/paises");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+
+    private class CrearPaisVM()
+    { 
+        public string Nombre { get; set; }
+    }
+
+}
