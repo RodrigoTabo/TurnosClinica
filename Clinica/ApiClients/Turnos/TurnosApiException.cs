@@ -12,6 +12,10 @@
             StatusCode = statusCode;
         }
 
+        public TurnosApiException(string? message) : base(message)
+        {
+        }
+
         public static async Task<TurnosApiException> FromHttpResponse(HttpResponseMessage resp)
         {
             try

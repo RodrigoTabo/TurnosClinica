@@ -24,19 +24,8 @@ namespace TurnosClinica.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CrearEspecialidadRequest request)
         {
-            try
-            {
                 var id = await _especialidadesService.CreateAsync(request);
                 return Created($"/api/especialidades/{id}", new { id });
-            }
-            catch (NotFoundAppException ex)
-            {
-                return NotFound(Problem(title: ex.Message, statusCode: 404));
-            }
-            catch (ConflictAppException ex)
-            {
-                return Conflict(Problem(title: ex.Message, statusCode: 409));
-            }
         }
 
 

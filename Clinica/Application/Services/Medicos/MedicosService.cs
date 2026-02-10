@@ -22,8 +22,8 @@ namespace TurnosClinica.Application.Services.Medicos
                 throw new KeyNotFoundException("La especialidad no existe.");
 
             //Validamos choque
-            var dni = _context.Medicos.Any(m => m.DNI == request.DNI);
-            if (dni)
+            var existedni = _context.Medicos.Any(m => m.DNI == request.DNI);
+            if (existedni)
                 throw new InvalidOperationException("El medico ya esta registrado");
 
             var medico = new Medico
@@ -48,7 +48,6 @@ namespace TurnosClinica.Application.Services.Medicos
 
             var lista = await query
                 .Select(m => new MedicoResponse {
-                Id = m.Id,
                 Nombre = m.Nombre,
                 Apellido = m.Apellido,
                 DNI = m.DNI,

@@ -29,13 +29,13 @@ namespace TurnosClinica.Controllers
                 var id = await _medicosService.CrearAsync(request);
                 return Created($"/api/medicos/{id}", new { id });
             }
-            catch (NotFoundAppException ex)
+            catch (InvalidOperationException ex)
             {
-                return NotFound(Problem(title: ex.Message, statusCode: 404));
+                return Conflict(new { message = ex.Message }); // 409
             }
-            catch (ConflictAppException ex)
+            catch (KeyNotFoundException ex)
             {
-                return Conflict(Problem(title: ex.Message, statusCode: 409));
+                return NotFound(new { message = ex.Message }); // 404
             }
         }
 

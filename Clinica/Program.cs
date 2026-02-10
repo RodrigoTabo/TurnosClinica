@@ -1,17 +1,18 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using TurnosClinica.Components;
-using TurnosClinica.Infrastructure.Data;
-using TurnosClinica.Application.Services.Turnos;
-using TurnosClinica.Application.Services.Medicos;
-using TurnosClinica.Application.Services.Especialidades;
-using TurnosClinica.ApiClients.Turnos;
-using TurnosClinica.ApiClients.Medicos;
 using TurnosClinica.ApiClients.Especialidades;
+using TurnosClinica.ApiClients.Medicos;
 using TurnosClinica.ApiClients.Paises;
+using TurnosClinica.ApiClients.Turnos;
+using TurnosClinica.Application.Services.Especialidades;
+using TurnosClinica.Application.Services.Medicos;
 using TurnosClinica.Application.Services.Paises;
+using TurnosClinica.Application.Services.Turnos;
+using TurnosClinica.Components;
+using TurnosClinica.Controllers;
+using TurnosClinica.Infrastructure.Data;
 
 
 
@@ -106,6 +107,7 @@ app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<ApiExceptionMiddleware>();
 app.MapControllers();
 
 app.MapStaticAssets();
