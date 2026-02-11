@@ -1,0 +1,148 @@
+﻿@page "/consultorios/crear"
+@rendermode InteractiveServer
+@using TurnosClinica.ApiClients.Consultorios
+@using TurnosClinica.Application.DTOs.Consultorios
+@using TurnosClinica.ApiClients.Ciudades
+@using TurnosClinica.Application.DTOs.Ciudades
+@inject ConsultoriosApiClient Api
+@inject CiudadesApiClient CiudadesApi
+@inject NavigationManager Nav
+
+
+<h3>Ingresar nuevo consultorio</h3>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" @bind="Model.Institucion" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Calle</label>
+    <input class="form-control" @bind="Model.Calle" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Altura</label>
+    <input class="form-control" @bind="Model.Altura" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Ciudades</label>
+    @if (CargandoCiudades)
+    {
+        <div class="form-text">Cargando ciudades...</div>
+    }
+    else
+    {
+        <select class="form-select" @bind="Model.CiudadId">
+            <option value="0" disabled>-- Seleccioná una ciudades --</option>
+
+            @foreach (var e in Ciudades)
+            {
+                <option value="@e.Id">@e.Nombre</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrWhiteSpace(ErrorCiudades))
+        {
+            <div class="text-danger mt-1">@ErrorCiudades</div>
+        }
+    }
+</div>
+
+<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
+    @(Guardando ? "Guardando..." : "Crear")
+</button>
+
+@code {
+    private string? Error;
+    private bool Guardando;
+
+
+    private bool CargandoCiudades = true;
+    private string? ErrorCiudades;
+
+    private CrearConsultoriosVM Model = new() { CiudadId = 0 };
+    private List<ItemCiudades> Ciudades = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarCiudades();
+    }
+
+    private async Task CargarCiudades()
+    {
+        CargandoCiudades = true;
+        ErrorCiudades = null;
+
+        try
+        {
+            var lista = await CiudadesApi.ListarAsync();
+
+            Ciudades = lista
+                .Select(x => new ItemCiudades(x.Id, x.Nombre))
+                .OrderBy(x => x.Nombre)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorCiudades = ex.Message;
+            Ciudades = new();
+        }
+        finally
+        {
+            CargandoCiudades = false;
+        }
+    }
+
+    private async Task Create()
+    {
+        Error = null;
+
+        if (Model.CiudadId <= 0)
+        {
+            Error = "Seleccioná una ciudad.";
+            return;
+        }
+
+        Guardando = true;
+
+        try
+        {
+            var req = new CrearConsultorioRequest
+            {
+                Institucion = Model.Institucion,
+                Altura = Model.Altura,
+                Calle = Model.Calle,
+                CiudadId = Model.CiudadId
+            };
+
+            await Api.CrearAsync(req);
+            Nav.NavigateTo("/consultorios");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+    private class CrearConsultoriosVM
+    {
+        public string Institucion { get; set; }
+        public string Calle { get; set; } = "";
+        public int Altura { get; set; }
+        public int CiudadId { get; set; }
+    }
+
+    private record ItemCiudades(int Id, string Nombre);
+}

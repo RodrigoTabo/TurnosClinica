@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TurnosClinica.Application.DTOs.Turnos;
 using TurnosClinica.Infrastructure.Data;
 using TurnosClinica.Models;

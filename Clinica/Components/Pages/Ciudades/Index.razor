@@ -1,0 +1,72 @@
+﻿@page "/ciudades"
+@using TurnosClinica.Application.DTOs.Ciudades
+@using TurnosClinica.ApiClients.Ciudades
+@inject CiudadesApiClient Api
+
+<h3>Lista de ciudades</h3>
+
+<NavLink class="btn btn-success mb-3" href="/ciudades/crear">
+    Crear nueva ciudad
+</NavLink>
+
+@if (!string.IsNullOrEmpty(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+@if (Cargando)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Provincia</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Ciudades)
+            {
+                <tr>
+                    <td>@c.Nombre</td>
+                    <td>@c.Provincia</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private List<CiudadResponse> Ciudades = new();
+    private bool Cargando;
+    private string? Error;
+
+
+    private async Task Cargar()
+    {
+        Error = null;
+        Cargando = true;
+        try
+        {
+            Ciudades = await Api.ListarAsync();
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+}

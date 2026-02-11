@@ -17,8 +17,7 @@
 
         public async Task<int> CrearAsync(CrearMedicoRequest request)
         {
-            var created = await _Http.PostJsonOrThrowAsync<CrearMedicoRequest, CreatedIdResponse>(
-                "api/medicos", request);
+            var created = await _Http.PostJsonOrThrowAsync<CrearMedicoRequest, CreatedIdResponse>("api/medicos", request);
             return created.Id;
         }
 

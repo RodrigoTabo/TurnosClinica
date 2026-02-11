@@ -1,0 +1,131 @@
+﻿@page "/ciudades/crear"
+@rendermode InteractiveServer
+@using TurnosClinica.ApiClients.Ciudades
+@using TurnosClinica.Application.DTOs.Ciudades
+@using TurnosClinica.ApiClients.Provincias
+@using TurnosClinica.Application.DTOs.Provincias
+@inject CiudadesApiClient Api
+@inject ProvinciasApiClient ProvinciasApi
+@inject NavigationManager Nav
+
+
+<h3>Crear ciudad</h3>
+
+<h3>Ingresar nueva ciudad</h3>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" @bind="Model.Nombre" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Provincias</label>
+    @if (CargandoProvincias)
+    {
+        <div class="form-text">Cargando provincias...</div>
+    }
+    else
+    {
+        <select class="form-select" @bind="Model.ProvinciasId">
+            <option value="0" disabled>-- Seleccioná una provincia --</option>
+
+            @foreach (var e in Provincias)
+            {
+                <option value="@e.Id">@e.Nombre</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrWhiteSpace(ErrorProvincias))
+        {
+            <div class="text-danger mt-1">@ErrorProvincias</div>
+        }
+    }
+</div>
+
+<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
+    @(Guardando ? "Guardando..." : "Crear")
+</button>
+
+
+@code {
+
+    private string? Error;
+    private bool Guardando;
+
+
+    private bool CargandoProvincias = true;
+    private string? ErrorProvincias;
+
+    private CrearCiudadVM Model = new() { ProvinciasId = 0 };
+    private List<ItemProvincias> Provincias = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarProvincias();
+    }
+
+    private async Task CargarProvincias()
+    {
+        CargandoProvincias = true;
+        ErrorProvincias = null;
+
+        try
+        {
+            var lista = await ProvinciasApi.ListarAsync();
+
+            Provincias = lista
+                .Select(x => new ItemProvincias(x.Id, x.Nombre))
+                .OrderBy(x => x.Nombre)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorProvincias = ex.Message;
+            Provincias = new();
+        }
+        finally
+        {
+            CargandoProvincias = false;
+        }
+    }
+
+    private async Task Create()
+    {
+        Error = null;
+        Guardando = true;
+
+        try
+        {
+            var req = new CrearCiudadRequest
+            {
+                Nombre = Model.Nombre,
+                ProvinciaId = Model.ProvinciasId
+            };
+
+            await Api.CrearAsync(req);
+            Nav.NavigateTo("/ciudades");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+    private class CrearCiudadVM
+    {
+        public string Nombre { get; set; }
+        public int ProvinciasId { get; set; }
+    }
+
+    private record ItemProvincias(int Id, string Nombre);
+
+}
