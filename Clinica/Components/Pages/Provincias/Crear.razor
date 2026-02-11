@@ -1,0 +1,135 @@
+﻿@page "/provincias/crear"
+@rendermode InteractiveServer
+@using TurnosClinica.ApiClients.Paises
+@using TurnosClinica.ApiClients.Provincias
+@using TurnosClinica.Application.DTOs.Paises
+@using TurnosClinica.Application.DTOs.Provincias
+@inject ProvinciasApiClient Api
+@inject PaisesApiClient PaisesApi
+@inject NavigationManager Nav
+
+<h3>Ingresar nueva provincia</h3>
+
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" @bind="Model.Nombre" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Paises</label>
+
+    @if (CargandoPaises)
+    {
+        <div class="form-text">Cargando paises...</div>
+    }
+    else
+    {
+        <select class="form-select" @bind="Model.PaisesId">
+            <option value="0" disabled>-- Seleccioná un Pais --</option>
+
+            @foreach (var p in Paises)
+            {
+                <option value="@p.Id">@p.Nombre</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrWhiteSpace(ErrorPaises))
+        {
+            <div class="text-danger mt-1">@ErrorPaises</div>
+        }
+    }
+</div>
+
+<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
+    @(Guardando ? "Guardando..." : "Crear")
+</button>
+
+@code {
+    private string? Error;
+    private bool Guardando;
+
+    private bool CargandoPaises = true;
+    private string? ErrorPaises;
+
+    private CrearProvinciasVM Model = new() { PaisesId = 0 };
+    private List<ItemPaises> Paises = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPaises();
+    }
+
+    private async Task CargarPaises()
+    {
+        CargandoPaises = true;
+        ErrorPaises = null;
+
+        try
+        {
+            var lista = await PaisesApi.ListarAsync();
+
+            Paises = lista
+                .Select(x => new ItemPaises(x.Id, x.Nombre))
+                .OrderBy(x => x.Nombre)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorPaises = ex.Message;
+            Paises = new();
+        }
+        finally
+        {
+            CargandoPaises = false;
+        }
+    }
+
+    private async Task Create()
+    {
+        Error = null;
+
+        if (Model.PaisesId <= 0)
+        {
+            Error = "Seleccioná una especialidad.";
+            return;
+        }
+
+        Guardando = true;
+
+        try
+        {
+            var req = new CrearProvinciaRequest
+            {
+                Nombre = Model.Nombre,
+                PaisId = Model.PaisesId
+            };
+
+            await Api.CrearAsync(req);
+            Nav.NavigateTo("/provincias");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+    private class CrearProvinciasVM
+    {
+        public string Nombre { get; set; } = "";
+        public int PaisesId { get; set; }
+    }
+
+    private record ItemPaises(int Id, string Nombre);
+
+}

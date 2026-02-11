@@ -5,7 +5,7 @@ namespace TurnosClinica.ApiClients.Common
 {
     public static class HttpClientExtensions
     {
-
+        //HttpClient extensions: “evita duplicar parseo/errores” Grabate esto wachin, lo estas haciendo espectacular.
         public static async Task<T> GetJsonOrThrowAsync<T>(this HttpClient http, string url)
         {
             var resp = await http.GetAsync(url);

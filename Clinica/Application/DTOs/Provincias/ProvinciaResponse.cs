@@ -8,6 +8,6 @@ namespace TurnosClinica.Application.DTOs.Provincias
         public string Nombre { get; set; }
         public List<Ciudad> Ciudades { get; set; } = new();
         public int PaisId { get; set; }
-        public Pais Pais { get; set; }
+        public string Pais { get; set; }
     }
 }

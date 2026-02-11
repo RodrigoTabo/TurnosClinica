@@ -27,19 +27,9 @@ namespace TurnosClinica.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CrearPaisRequest request)
         {
-            try
-            {
                 var id = await _paisesService.CrearAsync(request);
                 return Created($"/api/paises/{id}", new { id });
-            }
-            catch (NotFoundAppException ex)
-            {
-                return NotFound(Problem(title: ex.Message, statusCode: 404));
-            }
-            catch (ConflictAppException ex)
-            {
-                return Conflict(Problem(title: ex.Message, statusCode: 409));
-            }
+            
         }
 
     }

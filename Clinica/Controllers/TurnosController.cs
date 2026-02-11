@@ -26,19 +26,9 @@ namespace TurnosClinica.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CrearTurnoRequest request)
         {
-            try
-            {
+           
                 var id = await _service.CrearAsync(request);
                 return Created($"/api/turnos/{id}", new { id });
-            }
-            catch (NotFoundAppException ex)
-            {
-                return NotFound(Problem(title: ex.Message, statusCode: 404));
-            }
-            catch (ConflictAppException ex)
-            {
-                return Conflict(Problem(title: ex.Message, statusCode: 409));
-            }
         }
 
         [HttpGet("{id:int}")]

@@ -10,9 +10,11 @@ using TurnosClinica.Application.Services.Especialidades;
 using TurnosClinica.Application.Services.Medicos;
 using TurnosClinica.Application.Services.Paises;
 using TurnosClinica.Application.Services.Turnos;
+using TurnosClinica.Application.Services.Provincias;
 using TurnosClinica.Components;
 using TurnosClinica.Controllers;
 using TurnosClinica.Infrastructure.Data;
+using TurnosClinica.ApiClients.Provincias;
 
 
 
@@ -28,6 +30,8 @@ builder.Services.AddScoped<ITurnosService, TurnosService>();
 builder.Services.AddScoped<IMedicosService, MedicosService>();
 builder.Services.AddScoped<IEspecialidadesService, EspecialidadesService>();
 builder.Services.AddScoped<IPaisesService, PaisesService>();
+builder.Services.AddScoped<IProvinciasService, ProvinciasService>();
+
 
 
 
@@ -42,6 +46,8 @@ builder.Services.AddScoped<TurnosApiClient>();
 builder.Services.AddScoped<MedicosApiClient>();
 builder.Services.AddScoped<EspecialidadesApiClient>();
 builder.Services.AddScoped<PaisesApiClient>();
+builder.Services.AddScoped<ProvinciasApiClient>();
+
 
 
 

@@ -1,6 +1,7 @@
 ﻿namespace TurnosClinica.ApiClients.Especialidades
 {
     using System.Net.Http.Json;
+    using TurnosClinica.ApiClients.Common;
     using TurnosClinica.ApiClients.Turnos;
     using TurnosClinica.Application.DTOs.Especialidades;
     using static System.Net.WebRequestMethods;
@@ -24,16 +25,8 @@
 
         public async Task<int> CrearAsync(CrearEspecialidadRequest request)
         {
-            var resp = await _Http.PostAsJsonAsync("api/especialidades", request);
-
-            if (resp.IsSuccessStatusCode)
-            {
-                // Si la API devuelve { id: 123 } lo leemos.
-                // Si la API devuelve vacío, igual lo manejamos luego.
-                var created = await resp.Content.ReadFromJsonAsync<CreatedIdResponse>();
-                return created?.Id ?? 0;
-            }
-            throw await TurnosApiException.FromHttpResponse(resp);
+            var created = _Http.PostJsonOrThrowAsync<CrearEspecialidadRequest, CreatedIdResponse>("api/especialidades", request);
+            return created.Id;
         }
         private class CreatedIdResponse
         {

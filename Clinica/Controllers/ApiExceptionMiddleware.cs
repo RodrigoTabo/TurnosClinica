@@ -1,8 +1,9 @@
-﻿
-namespace TurnosClinica.Controllers
+﻿namespace TurnosClinica.Controllers
 {
     public class ApiExceptionMiddleware
     {
+
+        //Middleware: “convierte exceptions a HTTP consistente” Grabate esto Rodri, lo estas haciendo muy bien...
         private readonly RequestDelegate _next;
 
         public ApiExceptionMiddleware(RequestDelegate next) => _next = next;

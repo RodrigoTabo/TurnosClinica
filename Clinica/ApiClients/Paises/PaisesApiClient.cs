@@ -1,4 +1,6 @@
-﻿using TurnosClinica.ApiClients.Turnos;
+﻿using TurnosClinica.ApiClients.Common;
+using TurnosClinica.ApiClients.Turnos;
+using TurnosClinica.Application.DTOs.Medicos;
 using TurnosClinica.Application.DTOs.Paises;
 using static System.Net.WebRequestMethods;
 
@@ -14,30 +16,17 @@ namespace TurnosClinica.ApiClients.Paises
         }
 
 
-        public async Task<List<PaisResponse>> ListarAsync()
-        {
-            var url = $"api/paises";
 
-            var result = await _http.GetFromJsonAsync<List<PaisResponse>>(url);
-
-            return result ?? new List<PaisResponse>();
-
-        }
+        public Task<List<PaisResponse>> ListarAsync()
+            => _http.GetJsonOrThrowAsync<List<PaisResponse>>("api/paises");
 
         public async Task<int> CrearAsync(CrearPaisRequest request)
         {
-            var resp = await _http.PostAsJsonAsync("api/paises", request);
-
-            if (resp.IsSuccessStatusCode)
-            {
-                var created = await resp.Content.ReadFromJsonAsync<CreatedIdResponse>();
-                return created?.Id ?? 0;
-            }
-
-            throw await TurnosApiException.FromHttpResponse(resp);
+            var created = await _http.PostJsonOrThrowAsync<CrearPaisRequest, CreatedIdResponse>("api/paises", request);
+            return created.Id;
         }
 
-                private class CreatedIdResponse
+        private class CreatedIdResponse
         {
             public int Id { get; set; }
         }

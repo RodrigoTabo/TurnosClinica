@@ -53,6 +53,7 @@ namespace TurnosClinica.Application.Services.Provincias
                     Id = p.Id,
                     Nombre = p.Nombre,
                     PaisId = p.PaisId,
+                    Pais = p.Pais.Nombre
                 })
                 .ToListAsync();
 
