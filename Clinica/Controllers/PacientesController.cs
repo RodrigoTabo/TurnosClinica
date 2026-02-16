@@ -26,6 +26,13 @@ namespace TurnosClinica.Controllers
             return Created($"/api/pacientes/{id}", new { id });
         }
 
+        [HttpGet("id/{dni}")]
+        public async Task<ActionResult<Guid>> GetIdByDni([FromRoute] string dni)
+        {
+            var id = await _pacienteService.GetByDniAsync(dni);
+            return Ok(id);
+        }
+
 
     }
 }

@@ -4,11 +4,13 @@
 @using TurnosClinica.ApiClients.Estados
 @using TurnosClinica.ApiClients.Turnos
 @using TurnosClinica.ApiClients.Medicos
+@using TurnosClinica.ApiClients.Pacientes
 @using TurnosClinica.Application.DTOs.Turnos
 @inject TurnosApiClient Api
 @inject MedicosApiClient MedicosApi
 @inject ConsultoriosApiClient ConsultoriosApi
 @inject EstadosApiClient EstadosApi
+@inject PacientesApiClient PacientesApi
 @inject NavigationManager Nav
 
 <h3>Crear turno</h3>
@@ -19,9 +21,55 @@
 }
 
 <div class="mb-3">
-    <label class="form-label">PacienteId (Guid)</label>
-    <input class="form-control" @bind="Model.PacienteIdText" />
+    <label class="form-label">Paciente (buscar por DNI)</label>
+
+    <div class="input-group">
+        <input class="form-control" placeholder="DNI"
+               @bind="DniBusqueda" />
+        <button class="btn btn-outline-primary" @onclick="BuscarPaciente" disabled="@BuscandoPaciente">
+            @(BuscandoPaciente ? "Buscando..." : "Buscar")
+        </button>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(ErrorPacientes))
+    {
+        <div class="text-danger mt-1">@ErrorPacientes</div>
+    }
+
+    @if (PacienteAsignado is not null)
+    {
+        <div class="alert alert-success mt-2 mb-0 d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Paciente asignado:</strong>
+                @PacienteAsignado.Apellido, @PacienteAsignado.Nombre (DNI: @PacienteAsignado.DNI)
+            </div>
+            <button class="btn btn-sm btn-outline-danger" @onclick="QuitarPaciente">
+                Quitar
+            </button>
+        </div>
+    }
+
+    @if (ResultadoBusqueda is not null)
+    {
+        <div class="card mt-2">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@ResultadoBusqueda.Apellido, @ResultadoBusqueda.Nombre</strong>
+                    <div class="small text-muted">DNI: @ResultadoBusqueda.DNI</div>
+                </div>
+                <button class="btn btn-sm btn-success" @onclick="AsignarPaciente">
+                    Asignar
+                </button>
+            </div>
+        </div>
+    }
+    else if (Buscado && !BuscandoPaciente && PacienteAsignado is null)
+    {
+        <div class="form-text mt-2">No se encontró paciente con ese DNI.</div>
+        <!-- opcional: botón crear paciente -->
+    }
 </div>
+
 
 <div class="mb-3">
     <label class="form-label">Medicos</label>
@@ -79,14 +127,13 @@
     }
     else
     {
-        <select class="form-select" @bind="Model.EstadoId">
-            <option value="0" disabled>-- Seleccioná un estado --</option>
-
+        <select class="form-select" @bind="Model.EstadoId" disabled>
             @foreach (var e in Estados)
             {
                 <option value="@e.Id">@e.Nombre</option>
             }
         </select>
+
 
         @if (!string.IsNullOrWhiteSpace(ErrorEstados))
         {
@@ -109,6 +156,7 @@
     private bool Guardando;
 
 
+
     private bool CargandoMedicos;
     private string? ErrorMedicos;
 
@@ -116,7 +164,17 @@
     private string? ErrorConsultorios;
 
     private bool CargandoEstados;
+    private int EstadoSeleccionadoId;
     private string? ErrorEstados;
+
+    private string DniBusqueda = "";
+    private bool BuscandoPaciente;
+    private bool Buscado;
+    private string? ErrorPacientes;
+
+    private PacienteSelectorResponse? ResultadoBusqueda;
+    private PacienteSelectorResponse? PacienteAsignado;
+
 
 
     private CrearTurnoVm Model = new() { ConsultorioId = 0, EstadoId = 0, MedicoId = 0 };
@@ -177,6 +235,7 @@
             CargandoConsultorios = false;
         }
     }
+
     private async Task CargarEstados()
     {
         CargandoEstados = true;
@@ -186,10 +245,22 @@
         {
             var lista = await EstadosApi.ListarAsync();
 
-            Estados = lista
-                .Select(x => new ItemEstados(x.Id, x.Nombre))
-                .OrderBy(x => x.Nombre)
-                .ToList();
+            var pendiente = lista.FirstOrDefault(x => x.Nombre.Equals("Pendiente", StringComparison.OrdinalIgnoreCase));
+
+            if (pendiente is not null)
+            {
+                // lo pongo primero y lo marco como seleccionado
+                Estados.Add(new ItemEstados(pendiente.Id, pendiente.Nombre));
+                Model.EstadoId = pendiente.Id;
+            }
+
+
+            Estados = new List<ItemEstados>
+            {
+            new ItemEstados(pendiente.Id, pendiente.Nombre)
+            };
+
+            EstadoSeleccionadoId = pendiente.Id;
         }
         catch (Exception ex)
         {
@@ -200,6 +271,62 @@
         {
             CargandoEstados = false;
         }
+    }
+
+    private async Task BuscarPaciente()
+    {
+        ErrorPacientes = null;
+        Buscado = false;
+        ResultadoBusqueda = null;
+
+        var dni = (DniBusqueda ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(dni))
+        {
+            ErrorPacientes = "Ingresá un DNI.";
+            return;
+        }
+
+        BuscandoPaciente = true;
+        try
+        {
+            var p = await PacientesApi.GetIdByDniAsync(dni);
+
+            Buscado = true;
+            ResultadoBusqueda = new PacienteSelectorResponse(
+                p.Id,
+                p.DNI,       // o p.DNI según tu DTO
+                p.Nombre,
+                p.Apellido
+            );
+        }
+        catch (Exception ex)
+        {
+            // si tu API devuelve 404 cuando no existe, acá podés mapearlo a "no encontrado"
+            ErrorPacientes = ex.Message;
+            Buscado = true;
+            ResultadoBusqueda = null;
+        }
+        finally
+        {
+            BuscandoPaciente = false;
+        }
+    }
+
+
+    private void AsignarPaciente()
+    {
+        if (ResultadoBusqueda is null) return;
+
+        PacienteAsignado = ResultadoBusqueda;
+        Model.PacienteId = ResultadoBusqueda.Id; // Guid? recomendado
+
+        ResultadoBusqueda = null;
+    }
+
+    private void QuitarPaciente()
+    {
+        PacienteAsignado = null;
+        Model.PacienteId = null;
     }
 
     private async Task Create()
@@ -214,15 +341,10 @@
             if (Model.ConsultorioId == 0) { Error = "Seleccioná un consultorio."; return; }
             if (Model.EstadoId == 0) { Error = "Seleccioná un estado."; return; }
 
-            if (!Guid.TryParse(Model.PacienteIdText, out var pacienteId))
-            {
-                Error = "PacienteId inválido.";
-                return;
-            }
 
             var req = new CrearTurnoRequest
             {
-                PacienteId = pacienteId,
+                PacienteId = Model.PacienteId.Value,
                 MedicoId = Model.MedicoId,
                 ConsultorioId = Model.ConsultorioId,
                 EstadoId = Model.EstadoId,
@@ -247,7 +369,7 @@
 
     private class CrearTurnoVm
     {
-        public string PacienteIdText { get; set; } = "";
+        public Guid? PacienteId { get; set; }
         public int MedicoId { get; set; }
         public int ConsultorioId { get; set; }
         public int EstadoId { get; set; }
@@ -259,5 +381,9 @@
     private record ItemConsultorios(int Id, string Institucion);
 
     private record ItemEstados(int Id, string Nombre);
+
+    private record PacienteSelectorResponse(Guid Id, string DNI, string Nombre, string Apellido);
+
+
 
 }

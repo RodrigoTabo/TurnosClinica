@@ -27,6 +27,16 @@ namespace TurnosClinica.ApiClients.Pacientes
             return created.Id;
         }
 
+        public async Task<PacienteSelectorItem> GetIdByDniAsync(string? dni)
+        {
+            if (string.IsNullOrWhiteSpace(dni))
+                throw new ArgumentException("DNI vacío.", nameof(dni));
+
+            var url = $"api/pacientes/id/{Uri.EscapeDataString(dni)}";
+            return await _http.GetJsonOrThrowAsync<PacienteSelectorItem>(url);
+        }
+
+
         private class CreatedIdResponse
         {
             public Guid Id { get; set; }

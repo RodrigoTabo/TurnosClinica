@@ -40,6 +40,29 @@ namespace TurnosClinica.Application.Services.Pacientes
 
         }
 
+        public async Task<PacienteSelectorItem> GetByDniAsync(string dni)
+        {
+
+
+            dni = dni.Trim();
+
+            var item = await _context.Pacientes
+                .Where(p => p.DNI == dni)
+                .Select(p => new PacienteSelectorItem
+                {
+                    Id = p.Id,
+                    DNI = p.DNI,
+                    Nombre = p.Nombre,
+                    Apellido = p.Apellido
+                })
+                .FirstOrDefaultAsync();
+
+            if (item is null)
+                throw new InvalidOperationException("No existe un paciente con el DNI ingresado");
+
+            return item;
+        }
+
         public async Task<List<PacienteResponse>> ListarAsync(string? DNI, string? Nombre, string? Apellido)
         {
 

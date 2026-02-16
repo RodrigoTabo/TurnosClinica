@@ -7,6 +7,7 @@ namespace TurnosClinica.Application.Services.Pacientes
 
         Task<List<PacienteResponse>> ListarAsync(string? DNI, string? Nombre, string? Apellido);
         Task<Guid> CrearAsync(CrearPacienteRequest request);
+        Task<PacienteSelectorItem> GetByDniAsync(string dni);
 
     }
 }

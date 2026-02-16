@@ -13,7 +13,12 @@
 
 @if (!string.IsNullOrEmpty(Error))
 {
-    <h3>Cargando...</h3>
+    <div class="alert alert-danger">@Error</div>
+}
+
+@if (Cargando)
+{
+    <p>Cargando...</p>
 }
 else
 {
