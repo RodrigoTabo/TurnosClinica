@@ -1,0 +1,93 @@
+﻿@page "/pacientes/crear"
+@rendermode InteractiveServer
+@using TurnosClinica.Application.DTOs.Pacientes
+@using TurnosClinica.ApiClients.Pacientes
+@inject PacientesApiClient Api
+@inject NavigationManager Nav
+
+
+<h3>Crear paciente</h3>
+
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+else
+{
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input class="form-control" @bind="Model.Nombre" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Apellido</label>
+        <input class="form-control" @bind="Model.Apellido" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">DNI</label>
+        <input class="form-control" type="number" @bind="Model.DNI" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Fecha de Nacimiento</label>
+        <input class="form-control" type="date" @bind="Model.FechaNacimiento" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email Principal</label>
+        <input class="form-control" type="text" @bind="Model.EmailPrincipal" />
+    </div>
+
+    <button class="btn btn-success" @onclick="Create" disabled="@Guardando">
+        @(Guardando ? "Guardando..." : "Crear")
+    </button>
+}
+
+@code {
+
+    private string? Error;
+    private bool Guardando;
+
+    private CrearPacienteVM Model = new ();
+
+
+    private async Task Create()
+    {
+        Error = null;
+        Guardando = true;
+
+        try
+        {
+            var req = new CrearPacienteRequest
+            {
+                Nombre = Model.Nombre,
+                Apellido = Model.Apellido,
+                DNI = Model.DNI,
+                EmailPrincipal = Model.EmailPrincipal,
+                FechaNacimiento = Model.FechaNacimiento
+            };
+
+            await Api.CrearAsync(req);
+            Nav.NavigateTo("/pacientes");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+    private class CrearPacienteVM
+    {
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public DateTime FechaNacimiento { get; set; }
+        public string DNI { get; set; }
+        public string EmailPrincipal { get; set; }
+    }
+}

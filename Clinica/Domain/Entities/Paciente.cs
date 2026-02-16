@@ -8,7 +8,7 @@
         public  DateTime FechaNacimiento { get; set; }
         public string DNI { get; set; }
         public string EmailPrincipal { get; set; }
-        public string EmailPendiente { get; set; }
+        public string? EmailPendiente { get; set; }
 
         public HistoriaClinica? HistoriaClinica { get; set; }
         public List<Turno> Turnos { get; set; } = new();

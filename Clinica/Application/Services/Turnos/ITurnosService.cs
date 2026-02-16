@@ -1,5 +1,4 @@
 ﻿using TurnosClinica.Application.DTOs.Turnos;
-using TurnosClinica.Models;
 
 namespace TurnosClinica.Application.Services.Turnos
 {
