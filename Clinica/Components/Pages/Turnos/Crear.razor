@@ -1,8 +1,14 @@
 ﻿@page "/turnos/crear"
 @rendermode InteractiveServer
+@using TurnosClinica.ApiClients.Consultorios
+@using TurnosClinica.ApiClients.Estados
 @using TurnosClinica.ApiClients.Turnos
+@using TurnosClinica.ApiClients.Medicos
 @using TurnosClinica.Application.DTOs.Turnos
 @inject TurnosApiClient Api
+@inject MedicosApiClient MedicosApi
+@inject ConsultoriosApiClient ConsultoriosApi
+@inject EstadosApiClient EstadosApi
 @inject NavigationManager Nav
 
 <h3>Crear turno</h3>
@@ -18,13 +24,75 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">MedicoId (int)</label>
-    <input class="form-control" type="number" @bind="Model.MedicoId" />
+    <label class="form-label">Medicos</label>
+    @if (CargandoMedicos)
+    {
+        <div class="form-text">Cargando medicos...</div>
+    }
+    else
+    {
+        <select class="form-select" @bind="Model.MedicoId">
+            <option value="0" disabled>-- Seleccioná un medico --</option>
+
+            @foreach (var m in Medicos)
+            {
+                <option value="@m.Id">@m.Nombre</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrWhiteSpace(ErrorMedicos))
+        {
+            <div class="text-danger mt-1">@ErrorMedicos</div>
+        }
+    }
 </div>
 
 <div class="mb-3">
-    <label class="form-label">ConsultorioId (int)</label>
-    <input class="form-control" type="number" @bind="Model.ConsultorioId" />
+    <label class="form-label">Consultorios</label>
+    @if (CargandoConsultorios)
+    {
+        <div class="form-text">Cargando consultorios...</div>
+    }
+    else
+    {
+        <select class="form-select" @bind="Model.ConsultorioId">
+            <option value="0" disabled>-- Seleccioná un consultorio --</option>
+
+            @foreach (var c in Consultorios)
+            {
+                <option value="@c.Id">@c.Institucion</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrWhiteSpace(ErrorConsultorios))
+        {
+            <div class="text-danger mt-1">@ErrorConsultorios</div>
+        }
+    }
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Estados</label>
+    @if (CargandoEstados)
+    {
+        <div class="form-text">Cargando estados...</div>
+    }
+    else
+    {
+        <select class="form-select" @bind="Model.EstadoId">
+            <option value="0" disabled>-- Seleccioná un estado --</option>
+
+            @foreach (var e in Estados)
+            {
+                <option value="@e.Id">@e.Nombre</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrWhiteSpace(ErrorEstados))
+        {
+            <div class="text-danger mt-1">@ErrorEstados</div>
+        }
+    }
 </div>
 
 <div class="mb-3">
@@ -40,7 +108,99 @@
     private string? Error;
     private bool Guardando;
 
-    private CrearTurnoVm Model = new();
+
+    private bool CargandoMedicos;
+    private string? ErrorMedicos;
+
+    private bool CargandoConsultorios;
+    private string? ErrorConsultorios;
+
+    private bool CargandoEstados;
+    private string? ErrorEstados;
+
+
+    private CrearTurnoVm Model = new() { ConsultorioId = 0, EstadoId = 0, MedicoId = 0 };
+    private List<ItemMedicos> Medicos = new();
+    private List<ItemConsultorios> Consultorios = new();
+    private List<ItemEstados> Estados = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.WhenAll(CargarMedicos(), CargarConsultorios(), CargarEstados());
+    }
+
+    private async Task CargarMedicos()
+    {
+        CargandoMedicos = true;
+        ErrorMedicos = null;
+
+        try
+        {
+            var lista = await MedicosApi.ListarAsync();
+
+            Medicos = lista
+                .Select(x => new ItemMedicos(x.Id, x.Nombre))
+                .OrderBy(x => x.Nombre)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorMedicos = ex.Message;
+            Medicos = new();
+        }
+        finally
+        {
+            CargandoMedicos = false;
+        }
+    }
+    private async Task CargarConsultorios()
+    {
+        CargandoConsultorios = true;
+        ErrorConsultorios = null;
+        try
+        {
+            var lista = await ConsultoriosApi.ListarAsync();
+
+            Consultorios = lista
+                .Select(x => new ItemConsultorios(x.Id, x.Institucion))
+                .OrderBy(x => x.Institucion)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorConsultorios = ex.Message;
+            Consultorios = new();
+        }
+        finally
+        {
+            CargandoConsultorios = false;
+        }
+    }
+    private async Task CargarEstados()
+    {
+        CargandoEstados = true;
+        ErrorEstados = null;
+
+        try
+        {
+            var lista = await EstadosApi.ListarAsync();
+
+            Estados = lista
+                .Select(x => new ItemEstados(x.Id, x.Nombre))
+                .OrderBy(x => x.Nombre)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorEstados = ex.Message;
+            Estados = new();
+        }
+        finally
+        {
+            CargandoEstados = false;
+        }
+    }
 
     private async Task Create()
     {
@@ -49,6 +209,11 @@
 
         try
         {
+
+            if (Model.MedicoId == 0) { Error = "Seleccioná un médico."; return; }
+            if (Model.ConsultorioId == 0) { Error = "Seleccioná un consultorio."; return; }
+            if (Model.EstadoId == 0) { Error = "Seleccioná un estado."; return; }
+
             if (!Guid.TryParse(Model.PacienteIdText, out var pacienteId))
             {
                 Error = "PacienteId inválido.";
@@ -60,6 +225,7 @@
                 PacienteId = pacienteId,
                 MedicoId = Model.MedicoId,
                 ConsultorioId = Model.ConsultorioId,
+                EstadoId = Model.EstadoId,
                 FechaTurno = Model.FechaLocal
             };
 
@@ -77,11 +243,21 @@
         }
     }
 
+
+
     private class CrearTurnoVm
     {
         public string PacienteIdText { get; set; } = "";
         public int MedicoId { get; set; }
         public int ConsultorioId { get; set; }
+        public int EstadoId { get; set; }
         public DateTime FechaLocal { get; set; } = DateTime.Now;
     }
+
+    private record ItemMedicos(int Id, string Nombre);
+
+    private record ItemConsultorios(int Id, string Institucion);
+
+    private record ItemEstados(int Id, string Nombre);
+
 }

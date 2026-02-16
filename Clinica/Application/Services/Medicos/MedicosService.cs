@@ -48,6 +48,7 @@ namespace TurnosClinica.Application.Services.Medicos
 
             var lista = await query
                 .Select(m => new MedicoResponse {
+                Id = m.Id,
                 Nombre = m.Nombre,
                 Apellido = m.Apellido,
                 DNI = m.DNI,
