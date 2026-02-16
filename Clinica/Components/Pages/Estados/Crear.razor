@@ -1,11 +1,11 @@
-﻿@page "/especialidades/crear"
+﻿@page "/estados/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Especialidades
-@using TurnosClinica.Application.DTOs.Especialidades
-@inject EspecialidadesApiClient Api
+@using TurnosClinica.ApiClients.Estados
+@using TurnosClinica.Application.DTOs.Estados
+@inject EstadosApiClient Api
 @inject NavigationManager Nav
 
-<h3>Crear especialidad</h3>
+<h3>Crear estado</h3>
 
 @if (!string.IsNullOrWhiteSpace(Error))
 {
@@ -22,10 +22,10 @@
 </button>
 
 @code {
+
+    private CrearEstadoVM Model = new();
     private string? Error;
     private bool Guardando;
-
-    private CrearEspecialidadVM Model = new();
 
     private async Task Create()
     {
@@ -33,13 +33,14 @@
         Guardando = true;
         try
         {
-            var req = new CrearEspecialidadRequest
+            var req = new CrearEstadoRequest
             {
-                Nombre = Model.Nombre,
+                Nombre = Model.Nombre
             };
 
             await Api.CrearAsync(req);
-            Nav.NavigateTo("/especialidades");
+            Nav.NavigateTo("/estados");
+
         }
         catch (Exception ex)
         {
@@ -50,10 +51,10 @@
             Guardando = false;
         }
 
+
     }
 
-
-    private class CrearEspecialidadVM
+    private class CrearEstadoVM
     {
         public string Nombre { get; set; } = "";
     }

@@ -18,7 +18,6 @@ namespace TurnosClinica.Application.Services.Especialidades
         public async Task<List<EspecialidadResponse>> ListarAsync()
         {
 
-            // Metodo que desactiva el seguimiento automático de cambios para los resultados de una consulta
             var query = _context.Especialidades.AsNoTracking();
 
             var lista = await query

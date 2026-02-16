@@ -1,18 +1,19 @@
-﻿@page "/especialidades"
-@using TurnosClinica.ApiClients.Especialidades
-@using TurnosClinica.Application.DTOs.Especialidades
-@inject EspecialidadesApiClient Api
-
-<h3>Lista de medicos</h3>
+﻿@page "/estados"
+@using TurnosClinica.ApiClients.Estados
+@using TurnosClinica.Application.DTOs.Estados
+@inject EstadosApiClient Api
 
 
-<NavLink class="btn btn-success mb-3" href="/especialidades/crear">
-    Nueva especialidad
+
+<h3>Lista de estados</h3>
+
+<NavLink class="btn btn-success mb-3" href="/estados/crear">
+    Nuevo estado
 </NavLink>
 
 @if (!string.IsNullOrEmpty(Error))
 {
-    <h3>Cargando...</h3>
+    <h3>Cargando... </h3>
 }
 else
 {
@@ -23,7 +24,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var e in Especialidades)
+            @foreach (var e in Estados)
             {
                 <tr>
                     <td>@e.Nombre</td>
@@ -36,7 +37,7 @@ else
 
 @code {
 
-    private List<EspecialidadResponse> Especialidades = new();
+    private List<EstadoResponse> Estados = new();
     private bool Cargando;
     private string? Error;
 
@@ -44,10 +45,9 @@ else
     {
         Error = null;
         Cargando = true;
-
         try
         {
-            Especialidades = await Api.ListarAsync();
+            Estados = await Api.ListarAsync();
         }
         catch (Exception ex)
         {
@@ -57,12 +57,12 @@ else
         {
             Cargando = false;
         }
-
     }
 
     protected override async Task OnInitializedAsync()
     {
         await Cargar();
     }
+
 
 }
