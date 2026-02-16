@@ -73,7 +73,8 @@ namespace TurnosClinica.Application.Services.Turnos
                 MedicoId = request.MedicoId,
                 ConsultorioId = request.ConsultorioId,
                 FechaTurno = request.FechaTurno,
-                EstadoId = estadoId
+                EstadoId = estadoId,
+                Fecha = DateOnly.FromDateTime(DateTime.Now)
             };
 
             _context.Turnos.Add(turno);

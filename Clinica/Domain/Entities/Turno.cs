@@ -13,6 +13,6 @@
         public int ConsultorioId { get; set; }
         public Consultorio Consultorio { get; set; }
         public Pago? Pago { get; set; }
-
+        public DateOnly Fecha { get; set; }
     }
 }

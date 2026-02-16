@@ -32,7 +32,8 @@ namespace TurnosClinica.Application.Services.Medicos
                 Nombre = request.Nombre,
                 Apellido = request.Apellido,
                 DNI = request.DNI,
-                EspecialidadId = request.EspecialidadId
+                EspecialidadId = request.EspecialidadId,
+                Activo = true
             };
 
             _context.Medicos.Add(medico);

@@ -1,0 +1,201 @@
+﻿/* =========================================================
+   Variables (en el scope del panel)  ✅
+   ========================================================= */
+.admin-page {
+    --primary: #512bd4;
+    --primary-10: rgba(81, 43, 212, 0.10);
+    --primary-16: rgba(81, 43, 212, 0.16);
+    --bg: #f7f5ff;
+    --surface: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: rgba(81, 43, 212, 0.22);
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 14px 30px rgba(81, 43, 212, 0.12);
+    --focus: 0 0 0 4px rgba(81, 43, 212, 0.20);
+    /* Estética del panel */
+    padding: 1rem;
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 12px;
+}
+
+@media (min-width: 768px) {
+    .admin-page {
+        padding: 1.25rem 1.5rem;
+    }
+}
+
+/* Material Symbols: evita rarezas de alineación */
+:global(.material-symbols-outlined) {
+    line-height: 1;
+    vertical-align: middle;
+}
+
+/* =========================================================
+   Header
+   ========================================================= */
+.admin-header {
+    margin-bottom: 1.25rem;
+}
+
+.admin-title {
+    margin: 0 0 .25rem 0;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.admin-subtitle {
+    margin: 0;
+    color: var(--muted);
+}
+
+/* =========================================================
+   Secciones
+   ========================================================= */
+.admin-section {
+    margin: 1.25rem 0;
+}
+
+.admin-section-title {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: .9rem;
+}
+
+    .admin-section-title span {
+        color: var(--primary);
+    }
+
+    .admin-section-title h5 {
+        margin: 0;
+        font-weight: 900;
+    }
+
+/* =========================================================
+   Stats
+   ========================================================= */
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: grid;
+    place-items: center;
+    background: var(--primary-10);
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: .75rem;
+    font-weight: 900;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.stat-value {
+    font-size: 1.55rem;
+    font-weight: 900;
+    margin-top: .35rem;
+}
+
+/* =========================================================
+   Modules
+   ========================================================= */
+.module-card {
+    height: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem;
+    transform: translateY(0);
+    transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
+    will-change: transform;
+}
+
+@media (hover: hover) {
+    .module-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-16);
+    }
+}
+
+.module-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    display: grid;
+    place-items: center;
+    background: rgba(17, 24, 39, 0.04);
+    color: #64748b;
+    margin-bottom: 1rem;
+    transition: background .18s ease, color .18s ease;
+}
+
+.module-card:hover .module-icon {
+    background: var(--primary);
+    color: #fff;
+}
+
+.module-title {
+    margin: 0 0 .45rem 0;
+    font-weight: 900;
+}
+
+.module-desc {
+    margin: 0 0 1rem 0;
+    color: var(--muted);
+    font-size: .92rem;
+    line-height: 1.35rem;
+}
+
+/* =========================================================
+   Botón (tu HTML usa: class="btn btn-manage")
+   ========================================================= */
+.btn.btn-manage {
+    --bs-btn-color: var(--primary);
+    --bs-btn-bg: var(--primary-10);
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-color: var(--primary);
+    --bs-btn-hover-bg: var(--primary-16);
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-color: var(--primary);
+    --bs-btn-active-bg: var(--primary-16);
+    --bs-btn-active-border-color: transparent;
+    --bs-btn-focus-shadow-rgb: 81, 43, 212;
+    width: 100%;
+    font-weight: 900;
+    border-radius: var(--radius-md);
+    padding: .75rem .95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    text-decoration: none;
+}
+
+    .btn.btn-manage:focus,
+    .btn.btn-manage:focus-visible {
+        outline: none;
+        box-shadow: var(--focus);
+    }
+
+    .btn.btn-manage .material-symbols-outlined {
+        font-size: 20px;
+    }

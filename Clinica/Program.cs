@@ -2,24 +2,25 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using TurnosClinica.ApiClients.Especialidades;
-using TurnosClinica.ApiClients.Medicos;
-using TurnosClinica.ApiClients.Paises;
-using TurnosClinica.ApiClients.Turnos;
-using TurnosClinica.ApiClients.Provincias;
 using TurnosClinica.ApiClients.Ciudades;
 using TurnosClinica.ApiClients.Consultorios;
+using TurnosClinica.ApiClients.Especialidades;
 using TurnosClinica.ApiClients.Estados;
+using TurnosClinica.ApiClients.Medicos;
 using TurnosClinica.ApiClients.Pacientes;
-using TurnosClinica.Application.Services.Especialidades;
-using TurnosClinica.Application.Services.Medicos;
-using TurnosClinica.Application.Services.Paises;
-using TurnosClinica.Application.Services.Turnos;
-using TurnosClinica.Application.Services.Provincias;
+using TurnosClinica.ApiClients.Paises;
+using TurnosClinica.ApiClients.Provincias;
+using TurnosClinica.ApiClients.Turnos;
 using TurnosClinica.Application.Services.Ciudades;
 using TurnosClinica.Application.Services.Consultorios;
+using TurnosClinica.Application.Services.Especialidades;
 using TurnosClinica.Application.Services.Estados;
+using TurnosClinica.Application.Services.Medicos;
 using TurnosClinica.Application.Services.Pacientes;
+using TurnosClinica.Application.Services.Paises;
+using TurnosClinica.Application.Services.Panel;
+using TurnosClinica.Application.Services.Provincias;
+using TurnosClinica.Application.Services.Turnos;
 using TurnosClinica.Components;
 using TurnosClinica.Controllers;
 using TurnosClinica.Infrastructure.Data;
@@ -44,6 +45,8 @@ builder.Services.AddScoped<ICiudadService, CiudadService>();
 builder.Services.AddScoped<IConsultorioService, ConsultorioService>();
 builder.Services.AddScoped<IEstadoService, EstadoService>();
 builder.Services.AddScoped<IPacientesService, PacientesService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
 
 
 

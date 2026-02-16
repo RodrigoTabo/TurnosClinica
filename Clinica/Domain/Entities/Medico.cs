@@ -11,6 +11,6 @@
         public Especialidad Especialidad { get; set; }
 
         public List<Turno> Turnos { get; set; } = new();
-
+        public bool Activo { get; set; }
     }
 }

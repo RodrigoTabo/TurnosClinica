@@ -1,0 +1,249 @@
+﻿@page "/panel"
+@using TurnosClinica.Application.DTOs.Panel
+@using TurnosClinica.Application.Services.Panel
+@rendermode InteractiveServer
+@inject IDashboardService Dashboard
+
+
+<!-- Header -->
+<section class="admin-page">
+    <header class="admin-header">
+        <div>
+            <h2 class="admin-title">Panel Administrativo</h2>
+            <p class="admin-subtitle">Bienvenido de nuevo, aquí tienes un resumen de la red médica.</p>
+        </div>
+    </header>
+
+
+
+    @if (_summary is null)
+    {
+        <p>Cargando...</p>
+    }else
+    {
+        <!-- Stats -->
+        <section class="admin-section">
+            <div class="row g-4">
+                <div class="col-12 col-md-6 col-xl-3">
+                    <article class="stat-card">
+                        <div class="stat-icon">
+                            <span class="material-symbols-outlined">stethoscope</span>
+                        </div>
+
+                        <div class="stat-body">
+                            <div class="stat-label">Médicos Activos</div>
+                            <div class="stat-value">@(_summary?.MedicosActivos ?? 0)</div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-3">
+                    <article class="stat-card">
+                        <div class="stat-icon">
+                            <span class="material-symbols-outlined">how_to_reg</span>
+                        </div>
+
+                        <div class="stat-body">
+                            <div class="stat-label">Nuevos Pacientes</div>
+                            <div class="stat-value">@(_summary?.NuevosPacientes ?? 0)</div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-3">
+                    <article class="stat-card">
+                        <div class="stat-icon">
+                            <span class="material-symbols-outlined">pending_actions</span>
+                        </div>
+
+                        <div class="stat-body">
+                            <div class="stat-label">Turnos Hoy</div>
+                            <div class="stat-value">@(_summary?.TurnosHoy ?? 0)</div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-3">
+                    <article class="stat-card">
+                        <div class="stat-icon">
+                            <span class="material-symbols-outlined">domain</span>
+                        </div>
+
+                        <div class="stat-body">
+                            <div class="stat-label">Consultorios</div>
+                            <div class="stat-value">@(_summary?.Consultorios ?? 0)</div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    }
+
+
+    <!-- Modules -->
+    <section class="admin-section">
+        <div class="admin-section-title">
+            <span class="material-symbols-outlined">grid_view</span>
+            <h5>Módulos del Sistema</h5>
+        </div>
+
+        <div class="row g-4">
+            <!-- Módulo -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">clinical_notes</span>
+                    </div>
+
+                    <h6 class="module-title">Consultorios</h6>
+                    <p class="module-desc">Gestione las instalaciones físicas, equipos y disponibilidad de salas.</p>
+
+                    <a class="btn btn-manage" href="/consultorios">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">person_pin</span>
+                    </div>
+
+                    <h6 class="module-title">Médicos</h6>
+                    <p class="module-desc">Administre el staff médico, especialidades y horarios de atención.</p>
+
+                    <a class="btn btn-manage" href="/medicos">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">badge</span>
+                    </div>
+
+                    <h6 class="module-title">Pacientes</h6>
+                    <p class="module-desc">Acceda a historias clínicas, datos de contacto y antecedentes.</p>
+
+                    <a class="btn btn-manage" href="/pacientes">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">calendar_month</span>
+                    </div>
+
+                    <h6 class="module-title">Turnos</h6>
+                    <p class="module-desc">Calendario maestro de citas, cancelaciones y reprogramaciones.</p>
+
+                    <a class="btn btn-manage" href="/turnos">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">psychology</span>
+                    </div>
+
+                    <h6 class="module-title">Especialidades</h6>
+                    <p class="module-desc">Configuración de áreas médicas y requerimientos por especialidad.</p>
+
+                    <a class="btn btn-manage" href="/especialidades">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">rule</span>
+                    </div>
+
+                    <h6 class="module-title">Estados</h6>
+                    <p class="module-desc">Gestión de estados de turnos (Confirmado, Pendiente, Cancelado).</p>
+
+                    <a class="btn btn-manage" href="/estados">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">public</span>
+                    </div>
+
+                    <h6 class="module-title">Países</h6>
+                    <p class="module-desc">Mantenimiento de la tabla maestra de países y códigos internacionales.</p>
+
+                    <a class="btn btn-manage" href="/paises">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">map</span>
+                    </div>
+
+                    <h6 class="module-title">Provincias</h6>
+                    <p class="module-desc">Regiones administrativas por país para segmentación de pacientes.</p>
+
+                    <a class="btn btn-manage" href="/provincias">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="module-card">
+                    <div class="module-icon">
+                        <span class="material-symbols-outlined">location_city</span>
+                    </div>
+
+                    <h6 class="module-title">Ciudades</h6>
+                    <p class="module-desc">Localidades para el sistema de logística y domicilios de pacientes.</p>
+
+                    <a class="btn btn-manage" href="/ciudades">
+                        Gestionar
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+        </div>
+    </section>
+</section>
+
+@code {
+    @code {
+        private DashboardSummary? _summary;
+
+        protected override async Task OnInitializedAsync()
+        {
+            _summary = await Dashboard.GetSummaryAsync();
+        }
+    }
+
+}

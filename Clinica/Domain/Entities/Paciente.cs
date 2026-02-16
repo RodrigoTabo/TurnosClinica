@@ -12,5 +12,6 @@
 
         public HistoriaClinica? HistoriaClinica { get; set; }
         public List<Turno> Turnos { get; set; } = new();
+        public DateOnly FechaAlta { get; set; }
     }
 }

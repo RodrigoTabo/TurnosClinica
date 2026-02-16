@@ -28,7 +28,8 @@ namespace TurnosClinica.Application.Services.Pacientes
                 Apellido = request.Apellido,
                 FechaNacimiento = request.FechaNacimiento,
                 DNI = request.DNI,
-                EmailPrincipal = request.EmailPrincipal
+                EmailPrincipal = request.EmailPrincipal,
+                FechaAlta = DateOnly.FromDateTime(DateTime.Now)
             };
 
 
