@@ -15,6 +15,8 @@ namespace TurnosClinica.Infrastructure.Configuracion
 
             b.Property(x => x.Nombre).HasMaxLength(50).IsRequired();
             b.Property(x => x.Apellido).HasMaxLength(50).IsRequired();
+            b.Property(x => x.EmailPrincipal).HasMaxLength(254);
+            b.Property(x => x.EmailPendiente).HasMaxLength(254);
 
             b.HasIndex(x => x.DNI).IsUnique();
 
