@@ -14,28 +14,55 @@
 
         public TurnosApiException(string? message) : base(message)
         {
+            StatusCode = 0;
         }
+
 
         public static async Task<TurnosApiException> FromHttpResponse(HttpResponseMessage resp)
         {
+            var status = resp.StatusCode;
+
             try
             {
-                var pd = await resp.Content.ReadFromJsonAsync<ProblemDetailsLite>();
-                if (pd != null && !string.IsNullOrWhiteSpace(pd.Title))
-                    return new TurnosApiException(pd.Title, resp.StatusCode);
-            }
-            catch { /* ignore */ }
+                // 1) ValidationProblemDetails (400) -> trae "errors"
+                var vpd = await resp.Content.ReadFromJsonAsync<ValidationProblemDetailsLite>();
+                if (vpd?.Errors is not null && vpd.Errors.Count > 0)
+                {
+                    var first = vpd.Errors
+                        .SelectMany(kv => kv.Value ?? Array.Empty<string>())
+                        .FirstOrDefault();
 
-            // fallback
+                    if (!string.IsNullOrWhiteSpace(first))
+                        return new TurnosApiException(first, status);
+                }
+
+                // 2) ProblemDetails normal -> title / detail
+                var pd = await resp.Content.ReadFromJsonAsync<ProblemDetailsLite>();
+                var msg = pd?.Title ?? pd?.Detail;
+
+                if (!string.IsNullOrWhiteSpace(msg))
+                    return new TurnosApiException(msg, status);
+            }
+            catch
+            {
+                // ignore parse errors
+            }
+
+            // 3) fallback
             var text = await resp.Content.ReadAsStringAsync();
-            var msg = string.IsNullOrWhiteSpace(text) ? $"HTTP {(int)resp.StatusCode}" : text;
-            return new TurnosApiException(msg, resp.StatusCode);
+            var fallback = string.IsNullOrWhiteSpace(text) ? $"HTTP {(int)status}" : text;
+            return new TurnosApiException(fallback, status);
+        }
+
+        private class ValidationProblemDetailsLite
+        {
+            public string? Title { get; set; }
+            public Dictionary<string, string[]?>? Errors { get; set; }
         }
 
         private class ProblemDetailsLite
         {
             public string? Title { get; set; }
-            public int? Status { get; set; }
             public string? Detail { get; set; }
         }
     }

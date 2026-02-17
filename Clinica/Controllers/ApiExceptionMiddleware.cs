@@ -1,9 +1,9 @@
 ﻿namespace TurnosClinica.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+
     public class ApiExceptionMiddleware
     {
-
-        //Middleware: “convierte exceptions a HTTP consistente” Grabate esto Rodri, lo estas haciendo muy bien...
         private readonly RequestDelegate _next;
 
         public ApiExceptionMiddleware(RequestDelegate next) => _next = next;
@@ -16,20 +16,28 @@
             }
             catch (InvalidOperationException ex)
             {
-                context.Response.StatusCode = StatusCodes.Status409Conflict;
-                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                await WriteProblem(context, StatusCodes.Status409Conflict, ex.Message);
             }
             catch (KeyNotFoundException ex)
             {
-                context.Response.StatusCode = StatusCodes.Status404NotFound;
-                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                await WriteProblem(context, StatusCodes.Status404NotFound, ex.Message);
             }
             catch (ArgumentException ex)
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                await WriteProblem(context, StatusCodes.Status400BadRequest, ex.Message);
             }
         }
+
+        private static Task WriteProblem(HttpContext context, int status, string message)
+        {
+            context.Response.StatusCode = status;
+            return context.Response.WriteAsJsonAsync(new ProblemDetails
+            {
+                Title = message,
+                Status = status
+            });
+        }
     }
+
 
 }

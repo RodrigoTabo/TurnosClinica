@@ -5,26 +5,79 @@
 @inject PaisesApiClient Api
 @inject NavigationManager Nav
 
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Países</h2>
+        <p class="admin-subtitle">Crear</p>
+    </header>
 
-<h3>Crear Pais</h3>
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm pais-card">
+                <div class="card-header bg-white border-bottom p-4 pais-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <h5 class="mb-1">Nuevo país</h5>
+                            <div class="text-muted small">Completá el nombre y guardá</div>
+                        </div>
 
-@if (!string.IsNullOrWhiteSpace(Error))
-{
-    <div class="alert alert-danger">@Error</div>
-}
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                @onclick="Volver"
+                                @onclick:stopPropagation="true"
+                                @onclick:preventDefault="true"
+                                disabled="@Guardando">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
 
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
 
-<div class="mb-3">
-    <label class="form-label">Nombre</label>
-    <input class="form-control" @bind="Model.Nombre" />
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input class="form-control"
+                               placeholder="Ej: Argentina"
+                               @bind-value="Model.Nombre"
+                               @bind-value:event="oninput"
+                               disabled="@Guardando" />
+                        <div class="form-hint">Debe ser único. Se recortan espacios al guardar.</div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end"
+                     @onclick="FooterClick">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            @onclick="Volver"
+                            @onclick:stopPropagation="true"
+                            @onclick:preventDefault="true"
+                            disabled="@Guardando">
+                        Cancelar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-manage"
+                            @onclick="Create"
+                            @onclick:stopPropagation="true"
+                            @onclick:preventDefault="true"
+                            disabled="@Guardando">
+                        <i class="bi bi-check2-circle"></i>
+                        @(Guardando ? "Guardando..." : "Crear")
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
-<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
-    @(Guardando ? "Guardando..." : "Crear")
-</button>
-
 @code {
-
     private string? Error;
     private bool Guardando;
 
@@ -37,13 +90,11 @@
 
         try
         {
-            var req = new CrearPaisRequest
-            {
-                Nombre = Model.Nombre
-            };
+            var nombre = (Model.Nombre ?? "").Trim();
+            var req = new CrearPaisRequest { Nombre = nombre };
 
-            await Api.CrearAsync(req);
-            Nav.NavigateTo("/consultorios");
+            var id = await Api.CrearAsync(req);
+            Nav.NavigateTo($"/paises/details/{id}");
         }
         catch (Exception ex)
         {
@@ -55,10 +106,17 @@
         }
     }
 
-
-    private class CrearPaisVM()
-    { 
-        public string Nombre { get; set; }
+    private async Task FooterClick()
+    {
+        // Backup si el botón no recibe click (overlay)
+        if (Guardando) return;
+        await Create();
     }
 
+    private void Volver() => Nav.NavigateTo("/paises");
+
+    private class CrearPaisVM
+    {
+        public string Nombre { get; set; } = "";
+    }
 }

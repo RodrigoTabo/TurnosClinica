@@ -56,6 +56,7 @@
 
     private bool CargandoPaises = true;
     private string? ErrorPaises;
+    private string Nombre = string.Empty;
 
     private CrearProvinciasVM Model = new() { PaisesId = 0 };
     private List<ItemPaises> Paises = new();
@@ -73,7 +74,7 @@
 
         try
         {
-            var lista = await PaisesApi.ListarAsync();
+            var lista = await PaisesApi.ListarAsync(Nombre);
 
             Paises = lista
                 .Select(x => new ItemPaises(x.Id, x.Nombre))

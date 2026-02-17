@@ -1,0 +1,52 @@
+﻿/* =========================
+   Botón principal (btn-manage)
+   - hover normal + fallback por footer
+   ========================= */
+
+.admin-page .btn.btn-manage {
+    transition: transform .14s ease, box-shadow .18s ease, filter .18s ease;
+    will-change: transform;
+}
+
+    .admin-page .btn.btn-manage i {
+        transition: transform .14s ease, background .18s ease;
+    }
+
+/* Hover (normal) + Hover (fallback por footer si el overlay come el hover del botón) */
+@media (hover:hover) {
+    .admin-page .btn.btn-manage:not(:disabled):hover,
+    .admin-page .card-footer:hover .btn.btn-manage:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 32px rgba(81, 43, 212, 0.18);
+        filter: brightness(1.03);
+    }
+
+        .admin-page .btn.btn-manage:not(:disabled):hover i,
+        .admin-page .card-footer:hover .btn.btn-manage:not(:disabled) i {
+            transform: translateY(-1px);
+            background: rgba(81, 43, 212, 0.16);
+        }
+}
+
+/* Active */
+.admin-page .btn.btn-manage:not(:disabled):active {
+    transform: translateY(0);
+    box-shadow: 0 10px 22px rgba(81, 43, 212, 0.14);
+    filter: brightness(1.00);
+}
+
+/* Focus */
+.admin-page .btn.btn-manage:focus,
+.admin-page .btn.btn-manage:focus-visible {
+    outline: none;
+    box-shadow: var(--focus);
+}
+
+/* Disabled */
+.admin-page .btn.btn-manage:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}

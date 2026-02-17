@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using TurnosClinica.Domain.Entities.Interfaces;
 using TurnosClinica.Models;
 
 namespace TurnosClinica.Infrastructure.Data
@@ -11,7 +13,24 @@ namespace TurnosClinica.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(TurnosDbContext).Assembly);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
+                {
+                    var parameter = Expression.Parameter(entityType.ClrType, "e");
+                    var prop = Expression.Property(parameter, nameof(ISoftDelete.EliminadoEn));
+                    var nullConst = Expression.Constant(null, typeof(DateTime?));
+                    var body = Expression.Equal(prop, nullConst);
+
+                    var lambda = Expression.Lambda(body, parameter);
+
+                    modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+                }
+            }
+
         }
+
         public DbSet<Ciudad> Ciudades { get; set; }
         public DbSet<Consultorio> Consultorios { get; set; }
         public DbSet<Especialidad> Especialidades { get; set; }
@@ -25,7 +44,7 @@ namespace TurnosClinica.Infrastructure.Data
         public DbSet<Pais> Paises { get; set; }
         public DbSet<Provincia> Provincias { get; set; }
         public DbSet<Receta> Recetas { get; set; }
-        public DbSet<RecetaMedicamento> RecetaMedicamentos{ get; set; }
+        public DbSet<RecetaMedicamento> RecetaMedicamentos { get; set; }
         public DbSet<Turno> Turnos { get; set; }
     }
 

@@ -12,9 +12,13 @@ namespace TurnosClinica.Infrastructure.Configuracion
         {
             b.HasKey(x => x.Id);
 
-            b.HasIndex(x => x.Nombre).IsUnique();
+            b.HasIndex(x => x.Nombre)
+             .IsUnique()
+             .HasFilter("[EliminadoEn] IS NULL");
 
-            b.Property(x => x.Nombre).IsRequired();
+            b.Property(x => x.Nombre)
+             .IsRequired()
+             .HasMaxLength(120);
         }
 
 

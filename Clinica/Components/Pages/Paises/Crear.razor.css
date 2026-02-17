@@ -1,0 +1,116 @@
+﻿.admin-page .paises-scope {
+    color: var(--text);
+}
+
+/* Card */
+.admin-page .pais-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+/* Header */
+.admin-page .pais-header {
+    background: var(--surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+    .admin-page .pais-header h5 {
+        margin: 0 0 .25rem 0;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+    }
+
+    .admin-page .pais-header .text-muted {
+        color: var(--muted) !important;
+    }
+
+/* Form */
+.admin-page .form-label {
+    font-weight: 900;
+    color: var(--muted);
+    font-size: .8rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.admin-page .form-control {
+    border-radius: var(--radius-md);
+    padding: .75rem .85rem;
+    border: 1px solid rgba(81, 43, 212, 0.18);
+}
+
+    .admin-page .form-control:focus {
+        outline: none;
+        box-shadow: var(--focus);
+    }
+
+.admin-page .form-hint {
+    margin-top: .5rem;
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+/* Botón principal (Crear / Guardar / Editar) */
+.admin-page .btn.btn-manage {
+    border: 1px solid rgba(81, 43, 212, 0.18) !important;
+    box-shadow: 0 10px 22px rgba(81, 43, 212, 0.14);
+    font-weight: 900;
+    border-radius: var(--radius-md);
+    padding: .75rem .95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    transition: transform .14s ease, box-shadow .18s ease, filter .18s ease;
+    will-change: transform;
+}
+
+    .admin-page .btn.btn-manage i {
+        width: 28px;
+        height: 28px;
+        border-radius: 10px;
+        display: inline-grid;
+        place-items: center;
+        background: rgba(81, 43, 212, 0.12);
+        color: var(--primary);
+        transition: transform .14s ease, background .18s ease;
+    }
+
+/* Hover SOLO sobre el botón */
+@media (hover:hover) {
+    .admin-page .btn.btn-manage:not(:disabled):hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 32px rgba(81, 43, 212, 0.18);
+        filter: brightness(1.03);
+    }
+
+        .admin-page .btn.btn-manage:not(:disabled):hover i {
+            transform: translateY(-1px);
+            background: rgba(81, 43, 212, 0.16);
+        }
+}
+
+/* Active */
+.admin-page .btn.btn-manage:not(:disabled):active {
+    transform: translateY(0);
+    box-shadow: 0 10px 22px rgba(81, 43, 212, 0.14);
+    filter: brightness(1.00);
+}
+
+/* Focus */
+.admin-page .btn.btn-manage:focus,
+.admin-page .btn.btn-manage:focus-visible {
+    outline: none;
+    box-shadow: var(--focus);
+}
+
+/* Disabled */
+.admin-page .btn.btn-manage:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}

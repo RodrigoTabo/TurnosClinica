@@ -1,8 +1,6 @@
 ﻿using TurnosClinica.ApiClients.Common;
-using TurnosClinica.ApiClients.Turnos;
-using TurnosClinica.Application.DTOs.Medicos;
 using TurnosClinica.Application.DTOs.Paises;
-using static System.Net.WebRequestMethods;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TurnosClinica.ApiClients.Paises
 {
@@ -15,16 +13,30 @@ namespace TurnosClinica.ApiClients.Paises
             _http = http;
         }
 
+        public async Task<List<PaisResponse>> ListarAsync(string? Nombre)
+        {
+            var n = (Nombre ?? "").Trim();
+            var url = string.IsNullOrEmpty(n)
+                ? "api/paises"
+                : $"api/paises?Nombre={Uri.EscapeDataString(n)}";
 
-
-        public Task<List<PaisResponse>> ListarAsync()
-            => _http.GetJsonOrThrowAsync<List<PaisResponse>>("api/paises");
+            return await _http.GetJsonOrThrowAsync<List<PaisResponse>>(url);
+        }
 
         public async Task<int> CrearAsync(CrearPaisRequest request)
         {
             var created = await _http.PostJsonOrThrowAsync<CrearPaisRequest, CreatedIdResponse>("api/paises", request);
             return created.Id;
         }
+
+        public Task<PaisResponse> GetByIdAsync(int id)
+            => _http.GetJsonOrThrowAsync<PaisResponse>($"api/paises/{id}");
+
+        public Task UpdateAsync(int id, UpdatePaisRequest request)
+            => _http.PutJsonOrThrowAsync($"api/paises/{id}", request);
+
+        public Task SoftDeleteAsync(int id)
+            => _http.DeleteOrThrowAsync($"api/paises/{id}");
 
         private class CreatedIdResponse
         {
