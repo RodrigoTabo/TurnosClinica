@@ -63,6 +63,7 @@
 @code {
     private string? Error;
     private bool Guardando;
+    private string? Nombre;
 
     private bool CargandoEspecialidades = true;
     private string? ErrorEspecialidades;
@@ -82,7 +83,7 @@
 
         try
         {
-            var lista = await EspecialidadesApi.ListarAsync();
+            var lista = await EspecialidadesApi.ListarAsync(Nombre);
 
             Especialidades = lista
                 .Select(x => new ItemEspecialidad(x.Id, x.Nombre))
