@@ -57,7 +57,7 @@ namespace TurnosClinica.Application.Services.Paises
 
         public async Task<List<PaisResponse>> ListarAsync(string? nombre)
         {
-            var query = _context.Paises.AsNoTracking().Where(p => p.EliminadoEn == null); ;
+            var query = _context.Paises.AsNoTracking().Where(p => p.EliminadoEn == null);
 
             if (!string.IsNullOrWhiteSpace(nombre))
             {

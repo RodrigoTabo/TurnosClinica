@@ -8,5 +8,7 @@
         public Provincia Provincia { get; set; }
         public List<Consultorio> Consultorios { get; set; } = new();
 
+        public DateTime? EliminadoEn { get; set; }
+
     }
 }

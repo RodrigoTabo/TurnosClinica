@@ -9,47 +9,105 @@
 @inject NavigationManager Nav
 
 
-<h3>Crear ciudad</h3>
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Ciudades</h2>
+        <p class="admin-subtitle">Crear</p>
+    </header>
 
-<h3>Ingresar nueva ciudad</h3>
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm pais-card">
 
-@if (!string.IsNullOrWhiteSpace(Error))
-{
-    <div class="alert alert-danger">@Error</div>
-}
+                <div class="card-header bg-white border-bottom p-4 pais-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <h5 class="mb-1">Nueva ciudad</h5>
+                            <div class="text-muted small">Completá los datos y guardá</div>
+                        </div>
 
-<div class="mb-3">
-    <label class="form-label">Nombre</label>
-    <input class="form-control" @bind="Model.Nombre" />
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                @onclick="Volver"
+                                disabled="@Guardando">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input class="form-control"
+                                   placeholder="Ej: Mar del Plata"
+                                   @bind-value="Model.Nombre"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                            <div class="form-hint">Se recortan espacios al guardar.</div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Provincia</label>
+
+                            @if (CargandoProvincias)
+                            {
+                                <div class="form-text">Cargando provincias...</div>
+                            }
+                            else
+                            {
+                                @if (!string.IsNullOrWhiteSpace(ErrorProvincias))
+                                {
+                                    <div class="alert alert-danger py-2 mb-2">@ErrorProvincias</div>
+                                }
+
+                                <select class="form-select"
+                                        @bind="Model.ProvinciaId"
+                                        disabled="@Guardando">
+                                    <option value="0" disabled>-- Seleccioná una provincia --</option>
+
+                                    @foreach (var p in Provincias)
+                                    {
+                                        <option value="@p.Id">@p.Nombre</option>
+                                    }
+                                </select>
+
+                                <div class="form-hint">Elegí la provincia a la que pertenece la ciudad.</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            @onclick="Volver"
+                            disabled="@Guardando">
+                        Cancelar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-manage"
+                            @onclick="Create"
+                            disabled="@Guardando">
+                        <i class="bi bi-check2-circle"></i>
+                        @(Guardando ? "Guardando..." : "Crear")
+                    </button>
+
+
+                </div>
+
+            </div>
+        </div>
+    </section>
 </div>
 
-<div class="mb-3">
-    <label class="form-label">Provincias</label>
-    @if (CargandoProvincias)
-    {
-        <div class="form-text">Cargando provincias...</div>
-    }
-    else
-    {
-        <select class="form-select" @bind="Model.ProvinciasId">
-            <option value="0" disabled>-- Seleccioná una provincia --</option>
-
-            @foreach (var e in Provincias)
-            {
-                <option value="@e.Id">@e.Nombre</option>
-            }
-        </select>
-
-        @if (!string.IsNullOrWhiteSpace(ErrorProvincias))
-        {
-            <div class="text-danger mt-1">@ErrorProvincias</div>
-        }
-    }
-</div>
-
-<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
-    @(Guardando ? "Guardando..." : "Crear")
-</button>
 
 
 @code {
@@ -61,7 +119,7 @@
     private bool CargandoProvincias = true;
     private string? ErrorProvincias;
 
-    private CrearCiudadVM Model = new() { ProvinciasId = 0 };
+    private CrearCiudadVM Model = new() { ProvinciaId = 0 };
     private List<ItemProvincias> Provincias = new();
 
     protected override async Task OnInitializedAsync()
@@ -97,14 +155,35 @@
     private async Task Create()
     {
         Error = null;
+
+        // si todavía está cargando provincias, no dejamos crear
+        if (CargandoProvincias)
+        {
+            Error = "Esperá a que carguen las provincias.";
+            return;
+        }
+
+        var nombre = (Model.Nombre ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(nombre))
+        {
+            Error = "Ingresá un nombre.";
+            return;
+        }
+
+        if (Model.ProvinciaId <= 0)
+        {
+            Error = "Seleccioná una provincia.";
+            return;
+        }
+
         Guardando = true;
 
         try
         {
             var req = new CrearCiudadRequest
             {
-                Nombre = Model.Nombre,
-                ProvinciaId = Model.ProvinciasId
+                Nombre = nombre,
+                ProvinciaId = Model.ProvinciaId
             };
 
             await Api.CrearAsync(req);
@@ -120,12 +199,13 @@
         }
     }
 
+
     private class CrearCiudadVM
     {
-        public string Nombre { get; set; }
-        public int ProvinciasId { get; set; }
+        public string Nombre { get; set; } = "";
+        public int ProvinciaId { get; set; }
     }
-
+    private void Volver() => Nav.NavigateTo("/ciudades");
     private record ItemProvincias(int Id, string Nombre);
 
 }

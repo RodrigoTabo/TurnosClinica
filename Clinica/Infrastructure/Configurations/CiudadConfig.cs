@@ -11,9 +11,9 @@ namespace TurnosClinica.Infrastructure.Configuracion
 
             b.HasKey(x => x.Id);
 
-            b.Property(x => x.Nombre).IsRequired();
+            b.Property(x => x.Nombre).IsRequired().HasMaxLength(120);
 
-            b.HasIndex(x => new { x.ProvinciaId, x.Nombre }).IsUnique();
+            b.HasIndex(x => new { x.ProvinciaId, x.Nombre }).IsUnique().HasFilter("[EliminadoEn] IS NULL");
 
             b.HasIndex(x => x.ProvinciaId);
 

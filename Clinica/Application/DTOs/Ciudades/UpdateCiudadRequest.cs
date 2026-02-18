@@ -1,15 +1,15 @@
-﻿
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TurnosClinica.Application.DTOs.Ciudades
 {
-    public class CrearCiudadRequest
+    public class UpdateCiudadRequest
     {
-        [Required(ErrorMessage = "El nombre es obligatoria.")]
+        [Required(ErrorMessage = "Nombre es obligatorio.")]
         [MaxLength(120)]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+
         [Range(1, int.MaxValue, ErrorMessage = "La provincia es obligatoria.")]
         public int ProvinciaId { get; set; }
     }
+
 }

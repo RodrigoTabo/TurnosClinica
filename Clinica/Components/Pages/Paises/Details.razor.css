@@ -1,7 +1,4 @@
-﻿/* =========================
-   Botón principal (btn-manage)
-   - hover normal + fallback por footer
-   ========================= */
+﻿
 
 .admin-page .btn.btn-manage {
     transition: transform .14s ease, box-shadow .18s ease, filter .18s ease;

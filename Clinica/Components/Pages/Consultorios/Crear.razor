@@ -62,6 +62,7 @@
 @code {
     private string? Error;
     private bool Guardando;
+    private string? Nombre;
 
 
     private bool CargandoCiudades = true;
@@ -83,7 +84,7 @@
 
         try
         {
-            var lista = await CiudadesApi.ListarAsync();
+            var lista = await CiudadesApi.ListarAsync(Nombre);
 
             Ciudades = lista
                 .Select(x => new ItemCiudades(x.Id, x.Nombre))
