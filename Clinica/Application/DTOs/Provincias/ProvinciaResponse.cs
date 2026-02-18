@@ -9,5 +9,6 @@ namespace TurnosClinica.Application.DTOs.Provincias
         public List<Ciudad> Ciudades { get; set; } = new();
         public int PaisId { get; set; }
         public string Pais { get; set; }
+        public DateTime? Eliminadoen { get; set; }
     }
 }

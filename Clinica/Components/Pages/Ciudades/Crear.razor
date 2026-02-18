@@ -114,6 +114,7 @@
 
     private string? Error;
     private bool Guardando;
+    private string? Nombre;
 
 
     private bool CargandoProvincias = true;
@@ -134,7 +135,7 @@
 
         try
         {
-            var lista = await ProvinciasApi.ListarAsync();
+            var lista = await ProvinciasApi.ListarAsync(Nombre);
 
             Provincias = lista
                 .Select(x => new ItemProvincias(x.Id, x.Nombre))

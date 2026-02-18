@@ -8,6 +8,7 @@
         public List<Ciudad> Ciudades { get; set; } = new();
         public int PaisId { get; set; }
         public Pais Pais { get; set; }
+        public DateTime? EliminadoEn { get; set; }
 
     }
 }

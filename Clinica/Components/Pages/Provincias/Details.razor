@@ -1,15 +1,15 @@
-﻿@page "/ciudades/details/{Id:int}"
+﻿@page "/provincias/details/{Id:int}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Ciudades
 @using TurnosClinica.ApiClients.Provincias
-@using TurnosClinica.Application.DTOs.Ciudades
-@inject CiudadesApiClient CiudadesApiClient
+@using TurnosClinica.ApiClients.Paises
+@using TurnosClinica.Application.DTOs.Provincias
 @inject ProvinciasApiClient ProvinciasApiClient
+@inject PaisesApiClient PaisesApiClient
 @inject NavigationManager Nav
 
 <div class="admin-page">
     <header class="admin-header">
-        <h2 class="admin-title">Ciudades</h2>
+        <h2 class="admin-title">Provincias</h2>
         <p class="admin-subtitle">Detalle</p>
     </header>
 
@@ -20,7 +20,7 @@
                 <div class="card-header bg-white border-bottom p-4 pais-header">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                         <div>
-                            <h5 class="mb-1">Ciudad #@Id</h5>
+                            <h5 class="mb-1">Provincias #@Id</h5>
                             <div class="text-muted small">Ver y editar</div>
                         </div>
 
@@ -45,7 +45,7 @@
                     {
                         <div class="text-muted">Cargando...</div>
                     }
-                    else if (Ciudad is null)
+                    else if (Provincia is null)
                     {
                         <div class="alert alert-warning mb-0">No existe.</div>
                     }
@@ -63,7 +63,7 @@
 
                                 @if (!Editando)
                                 {
-                                    <div class="value-text">@Ciudad.Nombre</div>
+                                    <div class="value-text">@Provincia.Nombre</div>
                                 }
                                 else
                                 {
@@ -71,36 +71,36 @@
                                            @bind-value="Model.Nombre"
                                            @bind-value:event="oninput"
                                            disabled="@Guardando"
-                                           placeholder="Nombre de la ciudad" />
+                                           placeholder="Nombre de la provincia" />
                                 }
                             </div>
 
                             <div class="col-12 col-md-4">
-                                <label class="form-label">Provincia</label>
+                                <label class="form-label">Paises</label>
 
                                 @if (!Editando)
                                 {
-                                    <div class="value-text">@Ciudad.Provincia</div>
+                                    <div class="value-text">@Provincia.Pais</div>
                                 }
                                 else
                                 {
-                                    @if (!string.IsNullOrWhiteSpace(ErrorProvincias))
+                                    @if (!string.IsNullOrWhiteSpace(ErrorPaises))
                                     {
-                                        <div class="alert alert-danger py-2 mb-2">@ErrorProvincias</div>
+                                        <div class="alert alert-danger py-2 mb-2">@ErrorPaises</div>
                                     }
 
-                                    <InputSelect class="form-select" @bind-Value="Model.ProvinciaId" disabled="@Guardando">
-                                        <option value="0" disabled>-- Seleccioná una provincia --</option>
+                                    <InputSelect class="form-select" @bind-Value="Model.PaisId" disabled="@Guardando">
+                                        <option value="0" disabled>-- Seleccioná una País --</option>
 
-                                        @foreach (var p in Provincias)
+                                        @foreach (var p in Paises)
                                         {
                                             <option value="@p.Id">@p.Nombre</option>
                                         }
                                     </InputSelect>
 
-                                    @if (CargandoProvincias)
+                                    @if (CargandoPaises)
                                     {
-                                        <div class="text-muted small mt-1">Cargando provincias...</div>
+                                        <div class="text-muted small mt-1">Cargando paises...</div>
                                     }
 
 
@@ -112,7 +112,7 @@
                 </div>
 
                 <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end">
-                    @if (Ciudad is not null && !Cargando)
+                    @if (Provincia is not null && !Cargando)
                     {
                         @if (!Editando)
                         {
@@ -159,12 +159,12 @@
     private string? Nombre;
     private string? Error;
 
-    private CiudadResponse? Ciudad;
-    private UpdateCiudadRequest Model = new();
+    private ProvinciaResponse? Provincia;
+    private UpdateProvinciaRequest Model = new();
 
-    private bool CargandoProvincias = false;
-    private string? ErrorProvincias;
-    private List<ItemProvincias> Provincias = new();
+    private bool CargandoPaises = false;
+    private string? ErrorPaises;
+    private List<ItemPaises> Paises = new();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -178,21 +178,21 @@
 
         try
         {
-            Ciudad = await CiudadesApiClient.GetByIdAsync(Id);
+            Provincia = await ProvinciasApiClient.GetByIdAsync(Id);
 
-            if (Ciudad is not null)
+            if (Provincia is not null)
             {
-                Model.Nombre = Ciudad.Nombre;
-                Model.ProvinciaId = Ciudad.ProvinciaId;
+                Model.Nombre = Provincia.Nombre;
+                Model.PaisId = Provincia.PaisId;
             }
 
-            if (Provincias.Count == 0 && !CargandoProvincias)
-                await CargarProvincias();
+            if (Paises.Count == 0 && !CargandoPaises)
+                await CargarPaises();
         }
         catch (Exception ex)
         {
             Error = ex.Message;
-            Ciudad = null;
+            Provincia = null;
         }
         finally
         {
@@ -200,47 +200,47 @@
         }
     }
 
-    private async Task CargarProvincias()
+    private async Task CargarPaises()
     {
-        CargandoProvincias = true;
-        ErrorProvincias = null;
+        CargandoPaises = true;
+        ErrorPaises = null;
 
         try
         {
-            var lista = await ProvinciasApiClient.ListarAsync(Nombre);
+            var lista = await PaisesApiClient.ListarAsync(Nombre);
 
-            Provincias = lista
-                .Select(x => new ItemProvincias(x.Id, x.Nombre))
+            Paises = lista
+                .Select(x => new ItemPaises(x.Id, x.Nombre))
                 .OrderBy(x => x.Nombre)
                 .ToList();
         }
         catch (Exception ex)
         {
-            ErrorProvincias = ex.Message;
-            Provincias = new();
+            ErrorPaises = ex.Message;
+            Paises = new();
         }
         finally
         {
-            CargandoProvincias = false;
+            CargandoPaises = false;
         }
     }
 
     private async Task EntrarEdicion()
     {
-        if (Ciudad is null) return;
+        if (Provincia is null) return;
 
         Editando = true;
-        Model.Nombre = Ciudad.Nombre;
-        Model.ProvinciaId = Ciudad.ProvinciaId;
+        Model.Nombre = Provincia.Nombre;
+        Model.PaisId = Provincia.PaisId;
 
-        if (Provincias.Count == 0 && !CargandoProvincias)
-            await CargarProvincias();
+        if (Paises.Count == 0 && !CargandoPaises)
+            await CargarPaises();
     }
 
 
     private async Task Guardar()
     {
-        if (Ciudad is null) return;
+        if (Provincia is null) return;
 
         Guardando = true;
         Error = null;
@@ -252,17 +252,17 @@
             if (string.IsNullOrWhiteSpace(Model.Nombre))
                 throw new InvalidOperationException("Ingresá un nombre.");
 
-            if (Model.ProvinciaId <= 0)
-                throw new InvalidOperationException("Seleccioná una provincia.");
+            if (Model.PaisId <= 0)
+                throw new InvalidOperationException("Seleccioná un país.");
 
-            await CiudadesApiClient.UpdateAsync(Id, Model);
+            await ProvinciasApiClient.UpdateAsync(Id, Model);
 
-            Ciudad = await CiudadesApiClient.GetByIdAsync(Id);
+            Provincia = await ProvinciasApiClient.GetByIdAsync(Id);
 
-            if (Ciudad is not null)
+            if (Provincia is not null)
             {
-                Model.Nombre = Ciudad.Nombre;
-                Model.ProvinciaId = Ciudad.ProvinciaId;
+                Model.Nombre = Provincia.Nombre;
+                Model.PaisId = Provincia.PaisId;
             }
 
             Editando = false;
@@ -281,14 +281,14 @@
     {
         Editando = false;
 
-        if (Ciudad is not null)
+        if (Provincia is not null)
         {
-            Model.Nombre = Ciudad.Nombre;
-            Model.ProvinciaId = Ciudad.ProvinciaId;
+            Model.Nombre = Provincia.Nombre;
+            Model.PaisId = Provincia.PaisId;
         }
     }
 
-    private record ItemProvincias(int Id, string Nombre);
+    private record ItemPaises(int Id, string Nombre);
 
-    private void Volver() => Nav.NavigateTo("/ciudades");
+    private void Volver() => Nav.NavigateTo("/provincias");
 }

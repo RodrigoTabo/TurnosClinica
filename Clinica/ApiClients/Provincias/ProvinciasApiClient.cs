@@ -2,6 +2,7 @@
 using TurnosClinica.Application.DTOs.Medicos;
 using TurnosClinica.Application.DTOs.Provincias;
 using static System.Net.WebRequestMethods;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TurnosClinica.ApiClients.Provincias
 {
@@ -15,8 +16,14 @@ namespace TurnosClinica.ApiClients.Provincias
             _http = http;
         }
 
-        public Task<List<ProvinciaResponse>> ListarAsync()
-            => _http.GetJsonOrThrowAsync<List<ProvinciaResponse>>("api/provincias");
+        public async Task<List<ProvinciaResponse>> ListarAsync(string? Nombre)
+        {
+
+            var n = (Nombre ?? "").Trim();
+            var url = string.IsNullOrEmpty(n) ? "api/provincias" : $"api/provincias?nombre={Uri.EscapeDataString(n)}";
+
+            return await _http.GetJsonOrThrowAsync<List<ProvinciaResponse>>(url);
+        }
 
 
         public async Task<int> CrearAsync(CrearProvinciaRequest request)
@@ -24,6 +31,21 @@ namespace TurnosClinica.ApiClients.Provincias
             var created = await _http.PostJsonOrThrowAsync<CrearProvinciaRequest, CreatedIdResponse>(
                 "api/provincias", request);
             return created.Id;
+        }
+
+        public async Task<ProvinciaResponse> GetByIdAsync(int id)
+        {
+            return await _http.GetJsonOrThrowAsync<ProvinciaResponse>($"api/provincias/{id}");
+        }
+
+        public async Task UpdateAsync(int id, UpdateProvinciaRequest request)
+        {
+            await _http.PutJsonOrThrowAsync($"api/provincias/{id}", request);
+        }
+
+        public async Task SoftDeleteAsync(int id)
+        {
+            await _http.DeleteOrThrowAsync($"api/provincias/{id}");
         }
 
         private class CreatedIdResponse
