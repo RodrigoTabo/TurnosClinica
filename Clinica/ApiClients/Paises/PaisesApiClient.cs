@@ -29,14 +29,14 @@ namespace TurnosClinica.ApiClients.Paises
             return created.Id;
         }
 
-        public Task<PaisResponse> GetByIdAsync(int id)
-            => _http.GetJsonOrThrowAsync<PaisResponse>($"api/paises/{id}");
+        public async Task<PaisResponse> GetByIdAsync(int id)
+            => await _http.GetJsonOrThrowAsync<PaisResponse>($"api/paises/{id}");
 
-        public Task UpdateAsync(int id, UpdatePaisRequest request)
-            => _http.PutJsonOrThrowAsync($"api/paises/{id}", request);
+        public async Task UpdateAsync(int id, UpdatePaisRequest request)
+            =>  await _http.PutJsonOrThrowAsync($"api/paises/{id}", request);
 
-        public Task SoftDeleteAsync(int id)
-            => _http.DeleteOrThrowAsync($"api/paises/{id}");
+        public async Task SoftDeleteAsync(int id)
+            => await _http.DeleteOrThrowAsync($"api/paises/{id}");
 
         private class CreatedIdResponse
         {

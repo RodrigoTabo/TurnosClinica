@@ -6,5 +6,6 @@
         public int Id { get; set; }
         public string Nombre { get; set; }
         public List<Turno> Turnos { get; set; } = new();
+        public DateTime? EliminadoEn { get; set; }
     }
 }

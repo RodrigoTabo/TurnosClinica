@@ -1,5 +1,6 @@
 ﻿using TurnosClinica.ApiClients.Common;
 using TurnosClinica.Application.DTOs.Estados;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TurnosClinica.ApiClients.Estados
 {
@@ -12,12 +13,15 @@ namespace TurnosClinica.ApiClients.Estados
             _http = http;
         }
 
-        public async Task<List<EstadoResponse>> ListarAsync()
+        public async Task<List<EstadoResponse>> ListarAsync(string? nombre)
         {
-            var url = $"api/estados";
+            var n = (nombre ?? "").Trim();
 
-            var result = await _http.GetFromJsonAsync<List<EstadoResponse>>(url);
-            return result ?? new List<EstadoResponse>();
+            var url = string.IsNullOrEmpty(n)
+                ? "api/estados"
+                : $"api/estados?nombre={Uri.EscapeDataString(n)}";
+
+            return await _http.GetJsonOrThrowAsync<List<EstadoResponse>>(url);
         }
 
         public async Task<int> CrearAsync(CrearEstadoRequest request)
@@ -25,6 +29,16 @@ namespace TurnosClinica.ApiClients.Estados
             var created = _http.PostJsonOrThrowAsync<CrearEstadoRequest, CreatedIdResponse>("api/estados", request);
             return created.Id;
         }
+
+        public async Task<EstadoResponse> GetByIdAsync(int id)
+            => await _http.GetJsonOrThrowAsync<EstadoResponse>($"api/estados/{id}");
+
+        public async Task UpdateAsync(int id, UpdateEstadoRequest request)
+            => await _http.PutJsonOrThrowAsync($"api/estados/{id}", request);
+
+        public async Task SoftDeleteAsync(int id)
+            => await _http.DeleteOrThrowAsync($"api/estados/{id}");
+
         private class CreatedIdResponse
         {
             public int Id { get; set; }

@@ -30,7 +30,7 @@ namespace TurnosClinica.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<CiudadResponse>> GetById(int id)
+        public async Task<ActionResult<CiudadResponse>> GetByIdAsync(int id)
         {
             var ciudad = await _ciudadService.GetByIdAsync(id);
             return Ok(ciudad);

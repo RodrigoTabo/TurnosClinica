@@ -1,0 +1,201 @@
+﻿@page "/estados/details/{Id:int}"
+@rendermode InteractiveServer
+@using TurnosClinica.ApiClients.Estados
+@using TurnosClinica.Application.DTOs.Estados
+@inject EstadosApiClient EstadosApiClient
+@inject NavigationManager Nav
+
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Estados</h2>
+        <p class="admin-subtitle">Detalle</p>
+    </header>
+
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm pais-card">
+
+                <div class="card-header bg-white border-bottom p-4 pais-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <h5 class="mb-1">Estados #@Id</h5>
+                            <div class="text-muted small">Ver y editar</div>
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                @onclick="Volver"
+                                @onclick:stopPropagation="true"
+                                @onclick:preventDefault="true"
+                                disabled="@Guardando">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
+
+                <div class="card-body p-4">
+                    @if (Cargando)
+                    {
+                        <div class="text-muted">Cargando...</div>
+                    }
+                    else if (Estados is null)
+                    {
+                        <div class="alert alert-warning mb-0">No existe.</div>
+                    }
+                    else
+                    {
+                        <div class="row g-3">
+                            <div class="col-12 col-md-3">
+                                <label class="form-label">ID</label>
+                                <div class="value-pill">#@Estados.Id</div>
+                            </div>
+
+                            <div class="col-12 col-md-9">
+                                <label class="form-label">Nombre</label>
+
+                                @if (!Editando)
+                                {
+                                    <div class="value-text">@Estados.Nombre</div>
+                                }
+                                else
+                                {
+                                    <input class="form-control"
+                                           @bind-value="Model.Nombre"
+                                           @bind-value:event="oninput"
+                                           disabled="@Guardando"
+                                           placeholder="Nombre del país" />
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end">
+                    @if (Estados is not null && !Cargando)
+                    {
+                        @if (!Editando)
+                        {
+                            <button type="button"
+                                    class="btn btn-manage"
+                                    @onclick="EntrarEdicion"
+                                    @onclick:stopPropagation="true"
+                                    @onclick:preventDefault="true"
+                                    disabled="@Guardando">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="btn btn-manage"
+                                    @onclick="Guardar"
+                                    @onclick:stopPropagation="true"
+                                    @onclick:preventDefault="true"
+                                    disabled="@Guardando">
+                                <i class="bi bi-check2-circle"></i>
+                                @(Guardando ? "Guardando..." : "Guardar")
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    @onclick="Cancelar"
+                                    @onclick:stopPropagation="true"
+                                    @onclick:preventDefault="true"
+                                    disabled="@Guardando">
+                                Cancelar
+                            </button>
+                        }
+                    }
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private bool Cargando = true;
+    private bool Editando = false;
+    private bool Guardando = false;
+    private string? Error;
+
+    private EstadoResponse? Estados;
+    private UpdateEstadoRequest Model = new();
+
+    protected override async Task OnParametersSetAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        Cargando = true;
+        Error = null;
+
+        try
+        {
+            Estados = await EstadosApiClient.GetByIdAsync(Id);
+            if (Estados is not null)
+                Model.Nombre = Estados.Nombre;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+            Estados = null;
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private void EntrarEdicion()
+    {
+        if (Estados is null) return;
+        Editando = true;
+        Model.Nombre = Estados.Nombre;
+    }
+
+    private async Task Guardar()
+    {
+        if (Estados is null) return;
+
+        Guardando = true;
+        Error = null;
+
+        try
+        {
+            // guardamos tal cual esté (trim) y el server valida
+            Model.Nombre = (Model.Nombre ?? "").Trim();
+
+            await EstadosApiClient.UpdateAsync(Id, Model);
+
+            Estados = await EstadosApiClient.GetByIdAsync(Id);
+            if (Estados is not null)
+                Model.Nombre = Estados.Nombre;
+
+            Editando = false;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+    private void Cancelar()
+    {
+        Editando = false;
+        if (Estados is not null)
+            Model.Nombre = Estados.Nombre;
+    }
+
+    private void Volver() => Nav.NavigateTo("/estados");
+}

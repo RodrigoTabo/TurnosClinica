@@ -5,22 +5,77 @@
 @inject EstadosApiClient Api
 @inject NavigationManager Nav
 
-<h3>Crear estado</h3>
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Estados</h2>
+        <p class="admin-subtitle">Crear</p>
+    </header>
 
-@if (!string.IsNullOrWhiteSpace(Error))
-{
-    <div class="alert alert-danger">@Error</div>
-}
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm pais-card">
+                <div class="card-header bg-white border-bottom p-4 pais-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <h5 class="mb-1">Nuevo estado</h5>
+                            <div class="text-muted small">Completá el nombre y guardá</div>
+                        </div>
 
-<div class="mb-3">
-    <label class="form-label">Nombre</label>
-    <input class="form-control" @bind="Model.Nombre" />
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                @onclick="Volver"
+                                @onclick:stopPropagation="true"
+                                @onclick:preventDefault="true"
+                                disabled="@Guardando">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input class="form-control"
+                               placeholder="Ej: Confirmado"
+                               @bind-value="Model.Nombre"
+                               @bind-value:event="oninput"
+                               disabled="@Guardando" />
+                        <div class="form-hint">Debe ser único. Se recortan espacios al guardar.</div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end"
+                     @onclick="FooterClick">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            @onclick="Volver"
+                            @onclick:stopPropagation="true"
+                            @onclick:preventDefault="true"
+                            disabled="@Guardando">
+                        Cancelar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-manage"
+                            @onclick="Create"
+                            @onclick:stopPropagation="true"
+                            @onclick:preventDefault="true"
+                            disabled="@Guardando">
+                        <i class="bi bi-check2-circle"></i>
+                        @(Guardando ? "Guardando..." : "Crear")
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
-
-<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
-    @(Guardando ? "Guardando..." : "Crear")
-</button>
-
 @code {
 
     private CrearEstadoVM Model = new();
@@ -33,10 +88,9 @@
         Guardando = true;
         try
         {
-            var req = new CrearEstadoRequest
-            {
-                Nombre = Model.Nombre
-            };
+
+            var nombre = (Model.Nombre ?? "").Trim();
+            var req = new CrearEstadoRequest { Nombre = nombre };
 
             await Api.CrearAsync(req);
             Nav.NavigateTo("/estados");
@@ -50,9 +104,16 @@
         {
             Guardando = false;
         }
-
-
     }
+
+    private async Task FooterClick()
+    {
+        // Backup si el botón no recibe click (overlay)
+        if (Guardando) return;
+        await Create();
+    }
+
+    private void Volver() => Nav.NavigateTo("/estados");
 
     private class CrearEstadoVM
     {

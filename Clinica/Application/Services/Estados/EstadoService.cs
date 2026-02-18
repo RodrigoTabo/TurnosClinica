@@ -17,7 +17,7 @@ namespace TurnosClinica.Application.Services.Estados
         public async Task<int> CrearAsync(CrearEstadoRequest request)
         {
 
-            var existeEstado =  await _context.Estados.AnyAsync(e => e.Nombre == request.Nombre);
+            var existeEstado = await _context.Estados.AnyAsync(e => e.Nombre == request.Nombre);
 
             if (existeEstado)
                 throw new InvalidOperationException("El estado ya esta registrado.");
@@ -28,16 +28,22 @@ namespace TurnosClinica.Application.Services.Estados
             };
 
             _context.Estados.Add(estado);
-            
+
             await _context.SaveChangesAsync();
 
             return estado.Id;
 
         }
 
-        public async Task<List<EstadoResponse>> ListarAsync()
+        public async Task<List<EstadoResponse>> ListarAsync(string? nombre)
         {
-            var query = _context.Estados.AsNoTracking();
+            var query = _context.Estados.AsNoTracking().Where(e => e.EliminadoEn == null);
+
+            if (!string.IsNullOrWhiteSpace(nombre))
+            {
+                var n = nombre.Trim();
+                query = query.Where(p => p.Nombre.Contains(n));
+            }
 
             var lista = await query
                 .Select(e => new EstadoResponse
@@ -46,8 +52,46 @@ namespace TurnosClinica.Application.Services.Estados
                     Nombre = e.Nombre
                 }).ToListAsync();
 
-
             return lista;
+        }
+
+
+        public async Task<EstadoResponse> GetByIdAsync(int id)
+        {
+            var estado = await _context.Estados.AsNoTracking()
+                .Where(e => e.Id == id && e.EliminadoEn == null)
+                .Select(e => new EstadoResponse
+                {
+                    Id = e.Id,
+                    Nombre = e.Nombre
+                }).FirstOrDefaultAsync();
+            if (estado == null)
+                throw new KeyNotFoundException("Estado no encontrado.");
+            return estado;
+        }
+
+        public async Task UpdateAsync(int id, UpdateEstadoRequest request)
+        {
+            var estado = await _context.Estados.Where(e => e.Id == id && e.EliminadoEn == null).FirstOrDefaultAsync();
+
+            if (estado == null)
+                throw new KeyNotFoundException("Estado no encontrado.");
+
+            var existeEstado = await _context.Estados.AnyAsync(e => e.Id != id && e.Nombre == request.Nombre);
+
+            if (existeEstado)
+                throw new InvalidOperationException("El estado ya esta registrado.");
+            estado.Nombre = request.Nombre;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SoftDeleteAsync(int id)
+        {
+            var estado = await _context.Estados.Where(e => e.Id == id && e.EliminadoEn == null).FirstOrDefaultAsync();
+            if (estado == null)
+                throw new KeyNotFoundException("Estado no encontrado.");
+            estado.EliminadoEn = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
 
         }
     }

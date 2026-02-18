@@ -1,9 +1,9 @@
 ﻿namespace TurnosClinica.Application.DTOs.Estados
 {
-    public class EstadoResponse
+    public class UpdateEstadoRequest
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
-        public DateTime? Eliminadoen { get; set; }
+        public DateTime? EliminadoEn { get; set; }
     }
 }

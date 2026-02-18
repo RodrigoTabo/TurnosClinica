@@ -17,7 +17,7 @@ namespace TurnosClinica.Controllers
         }
 
         [HttpGet]
-        public async Task<List<EstadoResponse>> Get()=> await _estadoService.ListarAsync();
+        public async Task<List<EstadoResponse>> Get(string? nombre) => await _estadoService.ListarAsync(nombre);
 
 
         [HttpPost]
@@ -28,5 +28,27 @@ namespace TurnosClinica.Controllers
         }
 
 
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<EstadoResponse>> GetByIdAsync(int id)
+        {
+            var estado = await _estadoService.GetByIdAsync(id);
+            return Ok(estado);
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] UpdateEstadoRequest request)
+        {
+            await _estadoService.UpdateAsync(id, request);
+            return NoContent();
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> SoftDeleteAsync([FromRoute] int id)
+        {
+            await _estadoService.SoftDeleteAsync(id);
+            return NoContent();
+
+        }
     }
 }

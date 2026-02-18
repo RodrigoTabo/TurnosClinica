@@ -47,8 +47,6 @@ namespace TurnosClinica.Controllers
         }
 
 
-
-
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {

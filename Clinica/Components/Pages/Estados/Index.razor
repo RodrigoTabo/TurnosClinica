@@ -1,38 +1,135 @@
 ﻿@page "/estados"
+@rendermode InteractiveServer
 @using TurnosClinica.ApiClients.Estados
 @using TurnosClinica.Application.DTOs.Estados
 @inject EstadosApiClient Api
+@using Microsoft.JSInterop
+@inject IJSRuntime JsRuntime
 
 
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Estados</h2>
+        <p class="admin-subtitle">Administración</p>
+    </header>
 
-<h3>Lista de estados</h3>
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm paises-card">
+                <div class="card-header bg-white border-bottom p-4 paises-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div class="paises-head">
+                            <h5 class="mb-1">Lista de estados</h5>
+                            <div class="text-muted small">Gestioná el catálogo</div>
+                        </div>
 
-<NavLink class="btn btn-success mb-3" href="/estados/crear">
-    Nuevo estado
-</NavLink>
+                        <NavLink class="btn btn-manage" href="/estados/crear">
+                            <i class="bi bi-plus-lg"></i> Crear nuevo
+                        </NavLink>
+                    </div>
 
-@if (!string.IsNullOrEmpty(Error))
-{
-    <h3>Cargando... </h3>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var e in Estados)
-            {
-                <tr>
-                    <td>@e.Nombre</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+
+                    @*//FILTRO *@
+                    <div class="paises-filter">
+                        <div class="paises-filter-row">
+                            <div class="paises-filter-field">
+                                <label class="form-label mb-1">Nombre</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+
+                                    <InputText class="form-control"
+                                               @bind-Value="Nombre"
+                                               placeholder="Ej: Confirmado..." />
+                                </div>
+
+                            </div>
+
+                            <div class="paises-filter-actions">
+                                <button class="btn btn-manage" @onclick="Cargar">
+                                    <i class="bi bi-funnel"></i> Buscar
+                                </button>
+
+                                <button class="btn btn-outline-secondary" type="button" @onclick="Limpiar">
+                                    Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 paises-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-uppercase small fw-bold text-secondary">ID</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Nombre</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary text-center">Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (Cargando)
+                            {
+                                <tr>
+                                    <td colspan="3" class="py-4 text-center text-muted">Cargando...</td>
+                                </tr>
+                            }
+                            else if (Estados.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="3" class="py-4 text-center text-muted">No hay estados para mostrar.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var p in Estados)
+                                {
+                                    <tr>
+                                        <td class="ps-4 fw-bold">#@p.Id</td>
+                                        <td class="paises-name">@p.Nombre</td>
+                                        <td class="text-center">
+                                            <div class="btn-group paises-actions" role="group">
+                                                <NavLink class="btn btn-outline-primary btn-sm me-2"
+                                                         href="@($"/estados/details/{p.Id}")"
+                                                         title="Ver detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </NavLink>
+                                                @*   <NavLink class="btn btn-outline-warning btn-sm me-2"
+                                                         href="@($"/paises/details/{p.Id}")"
+                                                         title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </NavLink> *@
+                                                <button class="btn btn-outline-danger btn-sm"
+                                                        type="button"
+                                                        @onclick="() => Eliminar(p.Id)">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer paises-footer bg-white border-top p-4">
+                    <div class="text-muted">
+                        Total: <span class="fw-bold text-dark">@Estados.Count</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
 
 
 @code {
@@ -40,6 +137,13 @@ else
     private List<EstadoResponse> Estados = new();
     private bool Cargando;
     private string? Error;
+    private string? Nombre = "";
+
+    private async Task Limpiar()
+    {
+        Nombre = "";
+        await Cargar();
+    }
 
     private async Task Cargar()
     {
@@ -47,7 +151,7 @@ else
         Cargando = true;
         try
         {
-            Estados = await Api.ListarAsync();
+            Estados = await Api.ListarAsync(Nombre);
         }
         catch (Exception ex)
         {
@@ -56,6 +160,21 @@ else
         finally
         {
             Cargando = false;
+        }
+    }
+
+    private async Task Eliminar(int id)
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar el estado #{id}?"))
+            return;
+        try
+        {
+            await Api.SoftDeleteAsync(id);
+            await Cargar();
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
         }
     }
 

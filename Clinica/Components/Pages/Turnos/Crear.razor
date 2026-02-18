@@ -154,6 +154,7 @@
 @code {
     private string? Error;
     private bool Guardando;
+    private string? Nombre;
 
 
 
@@ -243,7 +244,7 @@
 
         try
         {
-            var lista = await EstadosApi.ListarAsync();
+            var lista = await EstadosApi.ListarAsync(Nombre);
 
             var pendiente = lista.FirstOrDefault(x => x.Nombre.Equals("Pendiente", StringComparison.OrdinalIgnoreCase));
 
