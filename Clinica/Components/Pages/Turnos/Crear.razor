@@ -219,7 +219,7 @@
         ErrorConsultorios = null;
         try
         {
-            var lista = await ConsultoriosApi.ListarAsync();
+            var lista = await ConsultoriosApi.ListarAsync(Nombre);
 
             Consultorios = lista
                 .Select(x => new ItemConsultorios(x.Id, x.Institucion))

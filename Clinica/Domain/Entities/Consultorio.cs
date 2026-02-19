@@ -10,6 +10,7 @@
         public int CiudadId { get; set; }
         public Ciudad Ciudad { get; set; }
         public List<Turno> Turnos { get; set; } = new();
+        public DateTime? EliminadoEn { get; set; }
 
     }
 }

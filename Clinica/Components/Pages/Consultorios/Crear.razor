@@ -9,55 +9,119 @@
 @inject NavigationManager Nav
 
 
-<h3>Ingresar nuevo consultorio</h3>
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Consultorios</h2>
+        <p class="admin-subtitle">Crear</p>
+    </header>
 
-@if (!string.IsNullOrWhiteSpace(Error))
-{
-    <div class="alert alert-danger">@Error</div>
-}
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm pais-card">
 
-<div class="mb-3">
-    <label class="form-label">Nombre</label>
-    <input class="form-control" @bind="Model.Institucion" />
+                <div class="card-header bg-white border-bottom p-4 pais-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <h5 class="mb-1">Nuevo consultorio</h5>
+                            <div class="text-muted small">Completá los datos y guardá</div>
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                @onclick="Volver"
+                                disabled="@Guardando">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
+
+                <div class="card-body p-6">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Institucion</label>
+                            <input class="form-control"
+                                   placeholder="Ej: Garraham"
+                                   @bind-value="Model.Institucion"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Calle</label>
+                            <input class="form-control"
+                                   placeholder="Ej: Av. Rivadavia"
+                                   @bind-value="Model.Calle"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Altura</label>
+                            <input class="form-control"
+                                   placeholder="Ej: 1810"
+                                   @bind-value="Model.Altura"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Ciudad</label>
+
+                            @if (CargandoCiudades)
+                            {
+                                <div class="form-text">Cargando Ciudades...</div>
+                            }
+                            else
+                            {
+                                @if (!string.IsNullOrWhiteSpace(ErrorCiudades))
+                                {
+                                    <div class="alert alert-danger py-2 mb-2">@ErrorCiudades</div>
+                                }
+
+                                <select class="form-select"
+                                        @bind="Model.CiudadId"
+                                        disabled="@Guardando">
+                                    <option value="0" disabled>-- Seleccioná una Ciudad --</option>
+
+                                    @foreach (var p in Ciudades)
+                                    {
+                                        <option value="@p.Id">@p.Nombre, @p.provincia</option>
+                                    }
+                                </select>
+
+                                <div class="form-hint">Elegí la Ciudad que le pertenezca a la Consultorio </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            @onclick="Volver"
+                            disabled="@Guardando">
+                        Cancelar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-manage"
+                            @onclick="Create"
+                            disabled="@Guardando">
+                        <i class="bi bi-check2-circle"></i>
+                        @(Guardando ? "Guardando..." : "Crear")
+                    </button>
+
+
+                </div>
+
+            </div>
+        </div>
+    </section>
 </div>
-
-<div class="mb-3">
-    <label class="form-label">Calle</label>
-    <input class="form-control" @bind="Model.Calle" />
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Altura</label>
-    <input class="form-control" @bind="Model.Altura" />
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Ciudades</label>
-    @if (CargandoCiudades)
-    {
-        <div class="form-text">Cargando ciudades...</div>
-    }
-    else
-    {
-        <select class="form-select" @bind="Model.CiudadId">
-            <option value="0" disabled>-- Seleccioná una ciudades --</option>
-
-            @foreach (var e in Ciudades)
-            {
-                <option value="@e.Id">@e.Nombre</option>
-            }
-        </select>
-
-        @if (!string.IsNullOrWhiteSpace(ErrorCiudades))
-        {
-            <div class="text-danger mt-1">@ErrorCiudades</div>
-        }
-    }
-</div>
-
-<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
-    @(Guardando ? "Guardando..." : "Crear")
-</button>
 
 @code {
     private string? Error;
@@ -87,7 +151,7 @@
             var lista = await CiudadesApi.ListarAsync(Nombre);
 
             Ciudades = lista
-                .Select(x => new ItemCiudades(x.Id, x.Nombre))
+                .Select(x => new ItemCiudades(x.Id, x.Nombre, x.Provincia))
                 .OrderBy(x => x.Nombre)
                 .ToList();
         }
@@ -105,6 +169,13 @@
     private async Task Create()
     {
         Error = null;
+
+        var nombre = (Model.Institucion ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(nombre))
+        {
+            Error = "Ingresá un Instituto.";
+            return;
+        }
 
         if (Model.CiudadId <= 0)
         {
@@ -145,5 +216,6 @@
         public int CiudadId { get; set; }
     }
 
-    private record ItemCiudades(int Id, string Nombre);
+    private void Volver() => Nav.NavigateTo("/consultorios");
+    private record ItemCiudades(int Id, string Nombre, string provincia);
 }
