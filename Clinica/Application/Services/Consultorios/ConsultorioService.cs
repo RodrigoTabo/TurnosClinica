@@ -80,6 +80,7 @@ namespace TurnosClinica.Application.Services.Consultorios
                     Institucion = c.Institucion,
                     Altura = c.Altura,
                     Calle = c.Calle,
+                    CiudadId = c.CiudadId,
                     Ciudad = c.Ciudad.Nombre + ", "
                        + c.Ciudad.Provincia.Nombre + ", "
                        + c.Ciudad.Provincia.Pais.Nombre

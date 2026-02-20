@@ -196,7 +196,7 @@
 
         try
         {
-            var lista = await MedicosApi.ListarAsync();
+            var lista = await MedicosApi.ListarAsync(Nombre);
 
             Medicos = lista
                 .Select(x => new ItemMedicos(x.Id, x.Nombre))

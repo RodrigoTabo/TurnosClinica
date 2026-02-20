@@ -12,5 +12,8 @@
 
         public List<Turno> Turnos { get; set; } = new();
         public bool Activo { get; set; }
+
+        public DateTime? EliminadoEn { get; set; }
+
     }
 }

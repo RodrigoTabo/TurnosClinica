@@ -1,15 +1,15 @@
-﻿@page "/consultorios/details/{Id:int}"
+﻿@page "/medicos/details/{Id:int}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Consultorios
-@using TurnosClinica.ApiClients.Ciudades
-@using TurnosClinica.Application.DTOs.Consultorios
-@inject ConsultoriosApiClient ConsultoriosApiClient
-@inject CiudadesApiClient CiudadesApiClient
+@using TurnosClinica.ApiClients.Medicos
+@using TurnosClinica.ApiClients.Especialidades
+@using TurnosClinica.Application.DTOs.Medicos
+@inject MedicosApiClient MedicosApiClient
+@inject EspecialidadesApiClient EspecialidadesApiClient
 @inject NavigationManager Nav
 
 <div class="admin-page">
     <header class="admin-header">
-        <h2 class="admin-title">Consultorios</h2>
+        <h2 class="admin-title">Medicos</h2>
         <p class="admin-subtitle">Detalle</p>
     </header>
 
@@ -20,7 +20,7 @@
                 <div class="card-header bg-white border-bottom p-4 pais-header">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                         <div>
-                            <h5 class="mb-1">Consultorios #@Id</h5>
+                            <h5 class="mb-1">Medicos #@Id</h5>
                             <div class="text-muted small">Ver y editar</div>
                         </div>
 
@@ -45,7 +45,7 @@
                     {
                         <div class="text-muted">Cargando...</div>
                     }
-                    else if (Consultorio is null)
+                    else if (Medico is null)
                     {
                         <div class="alert alert-warning mb-0">No existe.</div>
                     }
@@ -64,10 +64,10 @@
                                 <thead>
                                     <tr>
                                         <th class="text-muted text-nowrap">ID</th>
-                                        <th class="text-muted text-nowrap">Institución</th>
-                                        <th class="text-muted text-nowrap">Altura</th>
-                                        <th class="text-muted text-nowrap">Calle</th>
-                                        <th class="text-muted text-nowrap">Ciudad</th>
+                                        <th class="text-muted text-nowrap">DNI</th>
+                                        <th class="text-muted text-nowrap">Nombre</th>
+                                        <th class="text-muted text-nowrap">Apellido</th>
+                                        <th class="text-muted text-nowrap">Especialidad</th>
                                     </tr>
                                 </thead>
 
@@ -81,33 +81,33 @@
                                             @if (!Editando)
                                             {
                                                 <span class="value-text d-inline-block text-truncate" style="max-width:100%;">
-                                                    @Consultorio.Institucion
+                                                    @Medico.DNI
                                                 </span>
                                             }
                                             else
                                             {
                                                 <input class="form-control form-control-sm"
                                                        style="width:100%;"
-                                                       @bind-value="Model.Institucion"
+                                                       @bind-value="Model.DNI"
                                                        @bind-value:event="oninput"
                                                        disabled="@Guardando"
-                                                       placeholder="Nombre del consultorio" />
+                                                       placeholder="DNI del Medico" />
                                             }
                                         </td>
 
                                         <td class="text-nowrap">
                                             @if (!Editando)
                                             {
-                                                <span class="value-text">@Consultorio.Altura</span>
+                                                <span class="value-text">@Medico.Nombre</span>
                                             }
                                             else
                                             {
                                                 <input class="form-control form-control-sm"
                                                        style="width:100%;"
-                                                       @bind-value="Model.Altura"
+                                                       @bind-value="Model.Nombre"
                                                        @bind-value:event="oninput"
                                                        disabled="@Guardando"
-                                                       placeholder="Altura" />
+                                                       placeholder="Nombre del medico" />
                                             }
                                         </td>
 
@@ -115,17 +115,17 @@
                                             @if (!Editando)
                                             {
                                                 <span class="value-text d-inline-block text-truncate" style="max-width:100%;">
-                                                    @Consultorio.Calle
+                                                    @Medico.Apellido
                                                 </span>
                                             }
                                             else
                                             {
                                                 <input class="form-control form-control-sm"
                                                        style="width:100%;"
-                                                       @bind-value="Model.Calle"
+                                                       @bind-value="Model.Apellido"
                                                        @bind-value:event="oninput"
                                                        disabled="@Guardando"
-                                                       placeholder="Calle del consultorio" />
+                                                       placeholder="Apellido del medico" />
                                             }
                                         </td>
 
@@ -133,30 +133,30 @@
                                             @if (!Editando)
                                             {
                                                 <span class="value-text d-inline-block text-truncate" style="max-width:100%;">
-                                                    @Consultorio.Ciudad
+                                                    @Medico.Especialidad
                                                 </span>
                                             }
                                             else
                                             {
-                                                @if (!string.IsNullOrWhiteSpace(ErrorCiudades))
+                                                @if (!string.IsNullOrWhiteSpace(ErrorEspecialidades))
                                                 {
-                                                    <div class="alert alert-danger py-2 mb-2">@ErrorCiudades</div>
+                                                    <div class="alert alert-danger py-2 mb-2">@ErrorEspecialidades</div>
                                                 }
 
                                                 <InputSelect class="form-select form-select-sm"
                                                              style="width:100%;"
-                                                             @bind-Value="Model.CiudadId"
+                                                             @bind-Value="Model.EspecialidadId"
                                                              disabled="@Guardando">
-                                                    <option value="0" disabled>-- Seleccioná una Ciudad --</option>
-                                                    @foreach (var p in Ciudades)
+                                                    <option value="0" disabled>-- Seleccioná una Especialidad --</option>
+                                                    @foreach (var p in Especialidades)
                                                     {
                                                         <option value="@p.Id">@p.Nombre</option>
                                                     }
                                                 </InputSelect>
 
-                                                @if (CargandoCiudades)
+                                                @if (CargandoEspecialidades)
                                                 {
-                                                    <div class="text-muted small mt-1">Cargando ciudades...</div>
+                                                    <div class="text-muted small mt-1">Cargando Especialidades...</div>
                                                 }
                                             }
                                         </td>
@@ -168,7 +168,7 @@
                 </div>
 
                 <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end">
-                    @if (Consultorio is not null && !Cargando)
+                    @if (Medico is not null && !Cargando)
                     {
                         @if (!Editando)
                         {
@@ -215,12 +215,12 @@
     private string? Nombre;
     private string? Error;
 
-    private ConsultorioResponse? Consultorio;
-    private UpdateConsultorioRequest Model = new();
+    private MedicoResponse? Medico;
+    private UpdateMedicoRequest Model = new();
 
-    private bool CargandoCiudades = false;
-    private string? ErrorCiudades;
-    private List<ItemCiudades> Ciudades = new();
+    private bool CargandoEspecialidades = false;
+    private string? ErrorEspecialidades;
+    private List<ItemEspecialidades> Especialidades = new();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -234,23 +234,23 @@
 
         try
         {
-            Consultorio = await ConsultoriosApiClient.GetByIdAsync(Id);
+            Medico = await MedicosApiClient.GetByIdAsync(Id);
 
-            if (Consultorio is not null)
+            if (Medico is not null)
             {
-                Model.Institucion = Consultorio.Institucion;
-                Model.CiudadId = Consultorio.CiudadId;
-                Model.Altura = Consultorio.Altura;
-                Model.Calle = Consultorio.Calle;
+                Model.DNI = Medico.DNI;
+                Model.Nombre = Medico.Nombre;
+                Model.Apellido = Medico.Apellido;
+                Model.EspecialidadId = Medico.EspecialidadId;
             }
 
-            if (Ciudades.Count == 0 && !CargandoCiudades)
-                await CargarCiudades();
+            if (Especialidades.Count == 0 && !CargandoEspecialidades)
+                await CargarEspecialidades();
         }
         catch (Exception ex)
         {
             Error = ex.Message;
-            Consultorio = null;
+            Medico = null;
         }
         finally
         {
@@ -258,71 +258,73 @@
         }
     }
 
-    private async Task CargarCiudades()
+    private async Task CargarEspecialidades()
     {
-        CargandoCiudades = true;
-        ErrorCiudades = null;
+        CargandoEspecialidades = true;
+        ErrorEspecialidades = null;
 
         try
         {
-            var lista = await CiudadesApiClient.ListarAsync(Nombre);
+            var lista = await EspecialidadesApiClient.ListarAsync(Nombre);
 
-            Ciudades = lista
-                .Select(x => new ItemCiudades(x.Id, x.Nombre))
+            Especialidades = lista
+                .Select(x => new ItemEspecialidades(x.Id, x.Nombre))
                 .OrderBy(x => x.Nombre)
                 .ToList();
         }
         catch (Exception ex)
         {
-            ErrorCiudades = ex.Message;
-            Ciudades = new();
+            ErrorEspecialidades = ex.Message;
+            Especialidades = new();
         }
         finally
         {
-            CargandoCiudades = false;
+            CargandoEspecialidades = false;
         }
     }
 
     private async Task EntrarEdicion()
     {
-        if (Consultorio is null) return;
+        if (Medico is null) return;
 
         Editando = true;
-        Model.Institucion = Consultorio.Institucion;
-        Model.CiudadId = Consultorio.CiudadId;
-        Model.Altura = Consultorio.Altura;
-        Model.Calle = Consultorio.Calle;
+        Model.DNI = Medico.DNI;
+        Model.Nombre = Medico.Nombre;
+        Model.Apellido = Medico.Apellido;
+        Model.EspecialidadId = Medico.EspecialidadId;
 
-        if (Ciudades.Count == 0 && !CargandoCiudades)
-            await CargarCiudades();
+        if (Especialidades.Count == 0 && !CargandoEspecialidades)
+            await CargarEspecialidades();
     }
 
 
     private async Task Guardar()
     {
-        if (Consultorio is null) return;
+        if (Medico is null) return;
 
         Guardando = true;
         Error = null;
 
         try
         {
-            Model.Institucion = (Model.Institucion ?? "").Trim();
+            Model.Nombre = (Model.Nombre ?? "").Trim();
 
-            if (string.IsNullOrWhiteSpace(Model.Institucion))
-                throw new InvalidOperationException("Ingresá una Institucion.");
+            if (string.IsNullOrWhiteSpace(Model.Nombre))
+                throw new InvalidOperationException("Ingresá un nombre.");
 
-            if (Model.CiudadId <= 0)
-                throw new InvalidOperationException("Seleccioná una Ciudad.");
+            if (Model.EspecialidadId <= 0)
+                throw new InvalidOperationException("Seleccioná una Especialidad.");
 
-            await ConsultoriosApiClient.UpdateAsync(Id, Model);
+            await MedicosApiClient.UpdateAsync(Id, Model);
 
-            Consultorio = await ConsultoriosApiClient.GetByIdAsync(Id);
+            Medico = await MedicosApiClient.GetByIdAsync(Id);
 
-            if (Consultorio is not null)
+            if (Medico is not null)
             {
-                Model.Institucion = Consultorio.Institucion;
-                Model.CiudadId = Consultorio.CiudadId;
+                Model.DNI = Medico.DNI;
+                Model.Nombre = Medico.Nombre;
+                Model.Apellido = Medico.Apellido;
+                Model.EspecialidadId = Medico.EspecialidadId;
             }
 
             Editando = false;
@@ -341,14 +343,16 @@
     {
         Editando = false;
 
-        if (Consultorio is not null)
+        if (Medico is not null)
         {
-            Model.Institucion = Consultorio.Institucion;
-            Model.CiudadId = Consultorio.CiudadId;
+            Model.DNI = Medico.DNI;
+            Model.Nombre = Medico.Nombre;
+            Model.Apellido = Medico.Apellido;
+            Model.EspecialidadId = Medico.EspecialidadId;
         }
     }
 
-    private record ItemCiudades(int Id, string Nombre);
+    private record ItemEspecialidades(int Id, string Nombre);
 
-    private void Volver() => Nav.NavigateTo("/consultorios");
+    private void Volver() => Nav.NavigateTo("/medicos");
 }

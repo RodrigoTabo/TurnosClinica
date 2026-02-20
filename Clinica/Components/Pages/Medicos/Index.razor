@@ -1,49 +1,140 @@
 ﻿@page "/medicos"
+@rendermode InteractiveServer
 @using TurnosClinica.ApiClients.Medicos
 @using TurnosClinica.Application.DTOs.Medicos
 @inject MedicosApiClient Api
+@using Microsoft.JSInterop
+@inject IJSRuntime JsRuntime
 
-<h3>Lista de medicos</h3>
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Medicos</h2>
+        <p class="admin-subtitle">Administración</p>
+    </header>
 
-<NavLink class="btn btn-success mb-3" href="/medicos/crear">
-    Agregar nuevo medico
-</NavLink>
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm paises-card">
 
+                <div class="card-header bg-white border-bottom p-4 paises-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div class="paises-head">
+                            <h5 class="mb-1">Lista de Medicos</h5>
+                            <div class="text-muted small">Gestioná el catálogo</div>
+                        </div>
 
-@if (!string.IsNullOrWhiteSpace(Error))
-{
-    <div class="alert alert-danger">@Error</div>
-}
+                        <NavLink class="btn btn-manage" href="/medicos/crear">
+                            <i class="bi bi-plus-lg"></i> Registrar medico
+                        </NavLink>
+                    </div>
 
-@if (Cargando)
-{
-    <p>Cargando...</p>
-}
-else
-{
+                    @* FILTRO *@
+                    <div class="paises-filter">
+                        <div class="paises-filter-row">
+                            <div class="paises-filter-field">
+                                <label class="form-label mb-1">Medico</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>DNI</th>
-                <th>Especialidad</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var m in Medicos)
-            {
-                <tr>
-                    <td>@m.Nombre</td>
-                    <td>@m.Apellido</td>
-                    <td>@m.DNI</td>
-                    <td>@m.Especialidad</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+                                    <InputText class="form-control"
+                                               @bind-Value="Nombre"
+                                               placeholder="Ej: Esteban Fernandez..." />
+                                </div>
+                            </div>
+
+                            <div class="paises-filter-actions">
+                                <button type="button" class="btn btn-manage" @onclick="Cargar" disabled="@Cargando">
+                                    <i class="bi bi-funnel"></i> Buscar
+                                </button>
+
+                                <button type="button" class="btn btn-outline-secondary" @onclick="Limpiar" disabled="@Cargando">
+                                    Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 paises-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-uppercase small fw-bold text-secondary">ID</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">DNI</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Nombre</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Apellido</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Especialidad</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary text-center">Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (Cargando)
+                            {
+                                <tr>
+                                    <td colspan="6" class="py-4 text-center text-muted">Cargando...</td>
+                                </tr>
+                            }
+                            else if (Medicos is null || Medicos.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="6" class="py-4 text-center text-muted">No hay medicos para mostrar.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var c in Medicos)
+                                {
+                                    <tr>
+                                        <td class="ps-4 fw-bold">#@c.Id</td>
+                                        <td class="paises-name">@c.DNI</td>
+                                        <td class="text-muted">@c.Nombre</td>
+                                        <td class="text-muted">@c.Apellido</td>
+                                        <td class="text-muted">@c.Especialidad</td>
+
+                                        <td class="text-center">
+                                            <div class="btn-group paises-actions" role="group">
+
+                                                <NavLink class="btn btn-outline-primary btn-sm me-2"
+                                                         href="@($"/medicos/details/{c.Id}")"
+                                                         title="Ver detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </NavLink>
+
+                                                <button class="btn btn-outline-danger btn-sm"
+                                                        type="button"
+                                                        title="Eliminar"
+                                                        @onclick="() => Eliminar(c.Id)"
+                                                        disabled="@Cargando">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer paises-footer bg-white border-top p-4">
+                    <div class="text-muted">
+                        Total: <span class="fw-bold text-dark">@(Medicos?.Count ?? 0)</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
 
 
 @code {
@@ -51,6 +142,13 @@ else
     private List<MedicoResponse> Medicos = new();
     private bool Cargando;
     private string? Error;
+    private string? Nombre;
+
+    private async Task Limpiar()
+    {
+        Nombre = "";
+        await Cargar();
+    }
 
     private async Task Cargar()
     {
@@ -59,7 +157,7 @@ else
 
         try
         {
-            Medicos = await Api.ListarAsync();
+            Medicos = await Api.ListarAsync(Nombre);
         }
         catch (Exception ex)
         {
@@ -70,6 +168,22 @@ else
             Cargando = false;
         }
 
+    }
+
+
+    private async Task Eliminar(int id)
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar la ciudad #{id}?"))
+            return;
+        try
+        {
+            await Api.SoftDeleteAsync(id);
+            await Cargar();
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
     }
 
     protected override async Task OnInitializedAsync()
