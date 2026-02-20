@@ -36,6 +36,16 @@ namespace TurnosClinica.ApiClients.Pacientes
             return await _http.GetJsonOrThrowAsync<PacienteSelectorItem>(url);
         }
 
+        public async Task<PacienteResponse> GetByIdAsync(Guid id)
+            => await _http.GetJsonOrThrowAsync<PacienteResponse>($"api/pacientes/{id}");
+
+        public async Task UpdateAsync(Guid id, UpdatePacienteRequest request)
+            => await _http.PutJsonOrThrowAsync($"api/pacientes/{id}", request);
+
+        public async Task SoftDeleteAsync(Guid id)
+            => await _http.DeleteOrThrowAsync($"api/pacientes/{id}");
+
+
 
         private class CreatedIdResponse
         {

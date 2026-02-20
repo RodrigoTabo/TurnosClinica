@@ -6,44 +6,109 @@
 @inject NavigationManager Nav
 
 
-<h3>Crear paciente</h3>
+
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Pacientes</h2>
+        <p class="admin-subtitle">Crear</p>
+    </header>
+
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm pais-card">
+
+                <div class="card-header bg-white border-bottom p-4 pais-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <h5 class="mb-1">Nuevo paciente</h5>
+                            <div class="text-muted small">Completá los datos y guardá</div>
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                @onclick="Volver"
+                                disabled="@Guardando">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
+
+                <div class="card-body p-6">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">DNI</label>
+                            <input class="form-control"
+                                   placeholder="Ej: 123456789"
+                                   @bind-value="Model.DNI"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input class="form-control"
+                                   placeholder="Ej: Fernando"
+                                   @bind-value="Model.Nombre"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Apellido</label>
+                            <input class="form-control"
+                                   placeholder="Ej: De Rossi"
+                                   @bind-value="Model.Apellido"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Fecha de nacimiento</label>
+                            <input class="form-control"
+                                   placeholder="Ej: 06/06/1995"
+                                   @bind-value="Model.FechaNacimiento"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Email</label>
+                            <input class="form-control"
+                                   placeholder="Ej: paciente_nuevo@gmail.com"
+                                   @bind-value="Model.EmailPrincipal"
+                                   @bind-value:event="oninput"
+                                   disabled="@Guardando" />
+                        </div>
+
+                       
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            @onclick="Volver"
+                            disabled="@Guardando">
+                        Cancelar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-manage"
+                            @onclick="Create"
+                            disabled="@Guardando">
+                        <i class="bi bi-check2-circle"></i>
+                        @(Guardando ? "Guardando..." : "Crear")
+                    </button>
 
 
-@if (!string.IsNullOrWhiteSpace(Error))
-{
-    <div class="alert alert-danger">@Error</div>
-}
-else
-{
-    <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input class="form-control" @bind="Model.Nombre" />
-    </div>
+                </div>
 
-    <div class="mb-3">
-        <label class="form-label">Apellido</label>
-        <input class="form-control" @bind="Model.Apellido" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">DNI</label>
-        <input class="form-control" type="number" @bind="Model.DNI" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Fecha de Nacimiento</label>
-        <input class="form-control" type="date" @bind="Model.FechaNacimiento" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Email Principal</label>
-        <input class="form-control" type="text" @bind="Model.EmailPrincipal" />
-    </div>
-
-    <button class="btn btn-success" @onclick="Create" disabled="@Guardando">
-        @(Guardando ? "Guardando..." : "Crear")
-    </button>
-}
+            </div>
+        </div>
+    </section>
+</div>
 
 @code {
 
@@ -90,4 +155,6 @@ else
         public string DNI { get; set; }
         public string EmailPrincipal { get; set; }
     }
+
+    private void Volver() => Nav.NavigateTo("/pacientes");
 }

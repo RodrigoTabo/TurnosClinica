@@ -43,10 +43,7 @@ namespace TurnosClinica.Application.Services.Pacientes
 
         public async Task<PacienteSelectorItem> GetByDniAsync(string dni)
         {
-
-
             dni = dni.Trim();
-
             var item = await _context.Pacientes
                 .Where(p => p.DNI == dni)
                 .Select(p => new PacienteSelectorItem
@@ -63,6 +60,53 @@ namespace TurnosClinica.Application.Services.Pacientes
 
             return item;
         }
+
+
+        public async Task<PacienteResponse> GetByIdAsync(Guid id)
+        {
+            var paciente = await _context.Pacientes
+                .Where(p => p.Id == id)
+                .Select(p => new PacienteResponse
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre,
+                    Apellido = p.Apellido,
+                    FechaNacimiento = p.FechaNacimiento,
+                    DNI = p.DNI,
+                    EmailPrincipal = p.EmailPrincipal
+                })
+                .FirstOrDefaultAsync();
+            if (paciente is null)
+                throw new InvalidOperationException("No existe un paciente con el ID ingresado");
+            return paciente;
+        }
+
+        public async Task UpdateAsync(Guid Id, UpdatePacienteRequest request)
+        {
+            var paciente = await _context.Pacientes.FindAsync(Id);
+            if (paciente is null)
+                throw new InvalidOperationException("No existe un paciente con el ID ingresado");
+            var existeOtroPacienteConDni = await _context.Pacientes
+                .AnyAsync(p => p.DNI == request.DNI && p.Id != Id);
+            if (existeOtroPacienteConDni)
+                throw new InvalidOperationException("Ya existe otro paciente con el DNI ingresado");
+            paciente.Nombre = request.Nombre;
+            paciente.Apellido = request.Apellido;
+            paciente.FechaNacimiento = request.FechaNacimiento;
+            paciente.DNI = request.DNI;
+            paciente.EmailPrincipal = request.EmailPrincipal;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SoftDeleteAsync(Guid id)
+        {
+            var paciente = await _context.Pacientes.FindAsync(id);
+            if (paciente is null)
+                throw new InvalidOperationException("No existe un paciente con el ID ingresado");
+            _context.Pacientes.Remove(paciente);
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task<List<PacienteResponse>> ListarAsync(string? DNI, string? Nombre, string? Apellido)
         {

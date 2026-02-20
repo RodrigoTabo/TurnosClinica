@@ -1,0 +1,322 @@
+﻿@page "/pacientes/details/{Id:guid}"
+@rendermode InteractiveServer
+@using TurnosClinica.ApiClients.Pacientes
+@using TurnosClinica.Application.DTOs.Pacientes
+@inject PacientesApiClient PacientesApiClient
+@inject NavigationManager Nav
+
+<div class="admin-page">
+    <header class="admin-header">
+        <h2 class="admin-title">Pacientes</h2>
+        <p class="admin-subtitle">Detalle</p>
+    </header>
+
+    <section class="admin-section">
+        <div class="paises-scope">
+            <div class="card border-0 shadow-sm pais-card">
+
+                <div class="card-header bg-white border-bottom p-4 pais-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <h5 class="mb-1">Paciente #@Id</h5>
+                            <div class="text-muted small">Ver y editar</div>
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                @onclick="Volver"
+                                @onclick:stopPropagation="true"
+                                @onclick:preventDefault="true"
+                                disabled="@Guardando">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
+                    }
+                </div>
+
+                <div class="card-body p-6">
+                    @if (Cargando)
+                    {
+                        <div class="text-muted">Cargando...</div>
+                    }
+                    else if (Paciente is null)
+                    {
+                        <div class="alert alert-warning mb-0">No existe.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0" style="table-layout: fixed; width: 100%;">
+                                <colgroup>
+                                    <col style="width: 8%;" />
+                                    <col style="width: 26%;" />
+                                    <col style="width: 10%;" />
+                                    <col style="width: 22%;" />
+                                    <col style="width: 34%;" />
+                                </colgroup>
+
+                                <thead>
+                                    <tr>
+                                        <th class="text-muted text-nowrap">DNI</th>
+                                        <th class="text-muted text-nowrap">Nombre</th>
+                                        <th class="text-muted text-nowrap">Apellido</th>
+                                        <th class="text-muted text-nowrap">Fecha de Nacimiento</th>
+                                        <th class="text-muted text-nowrap">Email</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr>
+
+                                        <td style="min-width:0;">
+                                            @if (!Editando)
+                                            {
+                                                <span class="value-text d-inline-block text-truncate" style="max-width:100%;">
+                                                    @Paciente.DNI
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <input class="form-control form-control-sm"
+                                                       style="width:100%;"
+                                                       @bind-value="Model.DNI"
+                                                       @bind-value:event="oninput"
+                                                       disabled="@Guardando"
+                                                       placeholder="DNI del Medico" />
+                                            }
+                                        </td>
+
+                                        <td class="text-nowrap">
+                                            @if (!Editando)
+                                            {
+                                                <span class="value-text">@Paciente.Nombre</span>
+                                            }
+                                            else
+                                            {
+                                                <input class="form-control form-control-sm"
+                                                       style="width:100%;"
+                                                       @bind-value="Model.Nombre"
+                                                       @bind-value:event="oninput"
+                                                       disabled="@Guardando"
+                                                       placeholder="Nombre del medico" />
+                                            }
+                                        </td>
+
+                                        <td style="min-width:0;">
+                                            @if (!Editando)
+                                            {
+                                                <span class="value-text d-inline-block text-truncate" style="max-width:100%;">
+                                                    @Paciente.Apellido
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <input class="form-control form-control-sm"
+                                                       style="width:100%;"
+                                                       @bind-value="Model.Apellido"
+                                                       @bind-value:event="oninput"
+                                                       disabled="@Guardando"
+                                                       placeholder="Apellido del medico" />
+                                            }
+                                        </td>
+                                        <td style="min-width:0;">
+                                            @if (!Editando)
+                                            {
+                                                <span class="value-text d-inline-block text-truncate" style="max-width:100%;">
+                                                    @Paciente.FechaNacimiento
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <input class="form-control form-control-sm"
+                                                       style="width:100%;"
+                                                       @bind-value="Model.FechaNacimiento"
+                                                       @bind-value:event="oninput"
+                                                       disabled="@Guardando"
+                                                       placeholder="Apellido del medico" />
+                                            }
+                                        </td>
+                                        <td style="min-width:0;">
+                                            @if (!Editando)
+                                            {
+                                                <span class="value-text d-inline-block text-truncate" style="max-width:100%;">
+                                                    @Paciente.EmailPrincipal
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <input class="form-control form-control-sm"
+                                                       style="width:100%;"
+                                                       @bind-value="Model.EmailPrincipal"
+                                                       @bind-value:event="oninput"
+                                                       disabled="@Guardando"
+                                                       placeholder="Apellido del medico" />
+                                            }
+                                        </td>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end">
+                    @if (Paciente is not null && !Cargando)
+                    {
+                        @if (!Editando)
+                        {
+                            <button type="button"
+                                    class="btn btn-manage"
+                                    @onclick="EntrarEdicion"
+                                    disabled="@Guardando">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="btn btn-manage"
+                                    @onclick="Guardar"
+                                    disabled="@Guardando">
+                                <i class="bi bi-check2-circle"></i>
+                                @(Guardando ? "Guardando..." : "Guardar")
+                            </button>
+
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    @onclick="Cancelar"
+                                    disabled="@Guardando">
+                                Cancelar
+                            </button>
+
+                        }
+                    }
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private bool Cargando = true;
+    private bool Editando = false;
+    private bool Guardando = false;
+    private string? Nombre;
+    private string? Error;
+
+    private PacienteResponse? Paciente;
+    private UpdatePacienteRequest Model = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        Cargando = true;
+        Error = null;
+
+        try
+        {
+            Paciente = await PacientesApiClient.GetByIdAsync(Id);
+
+            if (Paciente is not null)
+            {
+                Model.DNI = Paciente.DNI;
+                Model.Nombre = Paciente.Nombre;
+                Model.Apellido = Paciente.Apellido;
+                Model.FechaNacimiento = Paciente.FechaNacimiento;
+                Model.EmailPrincipal = Paciente.EmailPrincipal;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+            Paciente = null;
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task EntrarEdicion()
+    {
+        if (Paciente is null) return;
+
+        Editando = true;
+        Model.DNI = Paciente.DNI;
+        Model.Nombre = Paciente.Nombre;
+        Model.Apellido = Paciente.Apellido;
+        Model.FechaNacimiento = Paciente.FechaNacimiento;
+        Model.EmailPrincipal = Paciente.EmailPrincipal;
+    }
+
+
+    private async Task Guardar()
+    {
+        if (Paciente is null) return;
+
+        Guardando = true;
+        Error = null;
+
+        try
+        {
+            Model.Nombre = (Model.Nombre ?? "").Trim();
+
+            if (string.IsNullOrWhiteSpace(Model.Nombre))
+                throw new InvalidOperationException("Ingresá un nombre.");
+
+            await PacientesApiClient.UpdateAsync(Id, Model);
+
+            Paciente = await PacientesApiClient.GetByIdAsync(Id);
+
+            if (Paciente is not null)
+            {
+                Model.DNI = Paciente.DNI;
+                Model.Nombre = Paciente.Nombre;
+                Model.Apellido = Paciente.Apellido;
+                Model.FechaNacimiento = Paciente.FechaNacimiento;
+                Model.EmailPrincipal = Paciente.EmailPrincipal;
+            }
+
+            Editando = false;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Guardando = false;
+        }
+    }
+
+    private void Cancelar()
+    {
+        Editando = false;
+
+        if (Paciente is not null)
+        {
+            Model.DNI = Paciente.DNI;
+            Model.Nombre = Paciente.Nombre;
+            Model.Apellido = Paciente.Apellido;
+            Model.FechaNacimiento = Paciente.FechaNacimiento;
+            Model.EmailPrincipal = Paciente.EmailPrincipal;
+        }
+    }
+
+    private void Volver() => Nav.NavigateTo("/pacientes");
+}
