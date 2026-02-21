@@ -14,5 +14,7 @@
         public Consultorio Consultorio { get; set; }
         public Pago? Pago { get; set; }
         public DateOnly Fecha { get; set; }
+
+        public DateTime? EliminadoEn { get; set; }
     }
 }

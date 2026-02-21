@@ -9,5 +9,10 @@ namespace TurnosClinica.Application.Services.Turnos
         Task<List<TurnoResponse>> ListarAsync(DateTime desde, DateTime hasta, int? medicoId = null);
         Task CambiarEstadoAsync(int turnoId, CambiarEstadoRequest request);
 
+        Task<TurnoResponse> GetByIdAsync(int id);
+        Task UpdateAsync(int Id, UpdateTurnoRequest request);
+
+        Task SoftDeleteAsync(int Id);
+
     }
 }

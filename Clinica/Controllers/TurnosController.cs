@@ -26,15 +26,9 @@ namespace TurnosClinica.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CrearTurnoRequest request)
         {
-           
-                var id = await _service.CrearAsync(request);
-                return Created($"/api/turnos/{id}", new { id });
-        }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<TurnoResponse>> GetById(int id)
-        {
-            throw new NotImplementedException();
+            var id = await _service.CrearAsync(request);
+            return Created($"/api/turnos/{id}", new { id });
         }
 
         [HttpPatch("{id:int}/estado")]
@@ -43,6 +37,31 @@ namespace TurnosClinica.Controllers
             await _service.CambiarEstadoAsync(id, request);
             return NoContent();
         }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<TurnoResponse>> GetByIdAsync(int id)
+        {
+            var turno = await _service.GetByIdAsync(id);
+            return Ok(turno);
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateTurnoRequest request)
+        {
+            await _service.UpdateAsync(id, request);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<ActionResult> SoftDeleteAsync(int id)
+        {
+            await _service.SoftDeleteAsync(id);
+            return NoContent();
+        }
+
 
     }
 }

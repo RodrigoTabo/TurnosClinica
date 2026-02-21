@@ -38,6 +38,16 @@
             throw await TurnosApiException.FromHttpResponse(resp);
         }
 
+
+        public async Task UpdateAsync(int id, UpdateTurnoRequest request)
+            => await _http.PutJsonOrThrowAsync($"api/turnos/{id}", request);
+
+        public async Task<TurnoResponse> GetByIdAsync(int id)
+            => await _http.GetJsonOrThrowAsync<TurnoResponse>($"api/turnos/{id}");
+
+        public async Task SoftDeleteAsync(int id)
+            => await _http.DeleteOrThrowAsync($"api/turnos/{id}");
+
         private class CreatedIdResponse
         {
             public int Id { get; set; }
