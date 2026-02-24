@@ -155,25 +155,3 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
   <img src="/Clinica/docs/img/turnos.png" alt="Turnos" width="850" />
 </p>
 
----
-
-## ⚙️ Cómo ejecutar el proyecto (local)
-
-### Requisitos
-
-- .NET SDK (versión X)
-- SQL Server (si aplica)
-- Visual Studio / VS Code
-
-### Pasos generales
-
-1. Clonar el repositorio
-2. Configurar cadena de conexión en `appsettings.json`
-3. Ejecutar migraciones (si aplica)
-4. Ejecutar el proyecto
-
-```bash
-dotnet restore
-dotnet build
-dotnet run
-```
