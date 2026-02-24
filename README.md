@@ -146,7 +146,7 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
 ### Home
 
 <p align="center">
-  <img src="/Clinica/docs/docs/img/home.png" alt="Home" width="850" />
+  <img src="/Clinica/docs/img/home.png" alt="Home" width="850" />
 </p>
 ### Gestion de medicos
 <p align="center">
