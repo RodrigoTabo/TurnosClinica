@@ -141,8 +141,6 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
 
 ## 📸 Capturas
 
-> Podés agregar screenshots de la app acá cuando quieras mostrar UI.
-
 ### Home
 
 <p align="center">
