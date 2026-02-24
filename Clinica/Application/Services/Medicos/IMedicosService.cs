@@ -14,5 +14,7 @@ namespace TurnosClinica.Application.Services.Medicos
 
         Task SoftDeleteAsync(int id);
 
+        Task<List<MedicoResponse>> ListarPorConsultorioAsync(int consultorioId);
+
     }
 }

@@ -1,8 +1,11 @@
 ﻿@page "/especialidades/details/{Id:int}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Especialidades
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Especialidades
-@inject EspecialidadesApiClient EspecialidadesApiClient
+@using TurnosClinica.Application.Services.Especialidades
+@using TurnosClinica.Domain.Entities
+@inject IEspecialidadesService EspecialidadService
+@attribute [Authorize(Roles = Roles.Admin)]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -138,7 +141,7 @@
 
         try
         {
-            Especialidad = await EspecialidadesApiClient.GetByIdAsync(Id);
+            Especialidad = await EspecialidadService.GetByIdAsync(Id);
             if (Especialidad is not null)
                 Model.Nombre = Especialidad.Nombre;
         }
@@ -172,9 +175,9 @@
             // guardamos tal cual esté (trim) y el server valida
             Model.Nombre = (Model.Nombre ?? "").Trim();
 
-            await EspecialidadesApiClient.UpdateAsync(Id, Model);
+            await EspecialidadService.UpdateAsync(Id, Model);
 
-            Especialidad = await EspecialidadesApiClient.GetByIdAsync(Id);
+            Especialidad = await EspecialidadService.GetByIdAsync(Id);
             if (Especialidad is not null)
                 Model.Nombre = Especialidad.Nombre;
 

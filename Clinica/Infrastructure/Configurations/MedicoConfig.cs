@@ -19,6 +19,10 @@ namespace TurnosClinica.Infrastructure.Configuracion
 
             b.HasIndex(x => x.DNI).IsUnique();
 
+            b.HasOne(x => x.Consultorio)
+                .WithMany(p => p.Medicos)
+                .HasForeignKey(x => x.ConsultorioId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             b.HasOne(x => x.Especialidad)
                 .WithMany(x => x.Medicos)

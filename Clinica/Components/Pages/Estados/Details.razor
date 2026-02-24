@@ -1,8 +1,10 @@
 ﻿@page "/estados/details/{Id:int}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Estados
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Estados
-@inject EstadosApiClient EstadosApiClient
+@using TurnosClinica.Application.Services.Estados
+@inject IEstadoService EstadoService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -138,7 +140,7 @@
 
         try
         {
-            Estados = await EstadosApiClient.GetByIdAsync(Id);
+            Estados = await EstadoService.GetByIdAsync(Id);
             if (Estados is not null)
                 Model.Nombre = Estados.Nombre;
         }
@@ -172,9 +174,9 @@
             // guardamos tal cual esté (trim) y el server valida
             Model.Nombre = (Model.Nombre ?? "").Trim();
 
-            await EstadosApiClient.UpdateAsync(Id, Model);
+            await EstadoService.UpdateAsync(Id, Model);
 
-            Estados = await EstadosApiClient.GetByIdAsync(Id);
+            Estados = await EstadoService.GetByIdAsync(Id);
             if (Estados is not null)
                 Model.Nombre = Estados.Nombre;
 

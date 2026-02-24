@@ -1,8 +1,10 @@
 ﻿@page "/paises/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Paises
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Paises
-@inject PaisesApiClient Api
+@using TurnosClinica.Application.Services.Paises
+@inject IPaisesService PaisesService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -93,7 +95,7 @@
             var nombre = (Model.Nombre ?? "").Trim();
             var req = new CrearPaisRequest { Nombre = nombre };
 
-            var id = await Api.CrearAsync(req);
+            var id = await PaisesService.CrearAsync(req);
             Nav.NavigateTo($"/paises/details/{id}");
         }
         catch (Exception ex)

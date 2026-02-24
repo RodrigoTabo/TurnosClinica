@@ -1,16 +1,19 @@
 ﻿@page "/turnos/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Consultorios
-@using TurnosClinica.ApiClients.Estados
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.ApiClients.Turnos
-@using TurnosClinica.ApiClients.Medicos
-@using TurnosClinica.ApiClients.Pacientes
 @using TurnosClinica.Application.DTOs.Turnos
-@inject TurnosApiClient Api
-@inject MedicosApiClient MedicosApi
-@inject ConsultoriosApiClient ConsultoriosApi
-@inject EstadosApiClient EstadosApi
-@inject PacientesApiClient PacientesApi
+@using TurnosClinica.Application.Services.Consultorios
+@using TurnosClinica.Application.Services.Estados
+@using TurnosClinica.Application.Services.Medicos
+@using TurnosClinica.Application.Services.Pacientes
+@using TurnosClinica.Application.Services.Turnos
+@inject IMedicosService MedicosService
+@inject IConsultorioService ConsultorioService
+@inject ITurnosService TurnosService
+@inject IEstadoService EstadoService
+@inject IPacientesService PacientesService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <h3>Crear turno</h3>
@@ -24,9 +27,8 @@
     <label class="form-label">Paciente (buscar por DNI)</label>
 
     <div class="input-group">
-        <input class="form-control" placeholder="DNI"
-               @bind="DniBusqueda" />
-        <button class="btn btn-outline-primary" @onclick="BuscarPaciente" disabled="@BuscandoPaciente">
+        <input class="form-control" placeholder="DNI" @bind="DniBusqueda" />
+        <button class="btn btn-outline-primary" type="button" @onclick="BuscarPaciente" disabled="@BuscandoPaciente">
             @(BuscandoPaciente ? "Buscando..." : "Buscar")
         </button>
     </div>
@@ -43,7 +45,7 @@
                 <strong>Paciente asignado:</strong>
                 @PacienteAsignado.Apellido, @PacienteAsignado.Nombre (DNI: @PacienteAsignado.DNI)
             </div>
-            <button class="btn btn-sm btn-outline-danger" @onclick="QuitarPaciente">
+            <button class="btn btn-sm btn-outline-danger" type="button" @onclick="QuitarPaciente">
                 Quitar
             </button>
         </div>
@@ -57,54 +59,29 @@
                     <strong>@ResultadoBusqueda.Apellido, @ResultadoBusqueda.Nombre</strong>
                     <div class="small text-muted">DNI: @ResultadoBusqueda.DNI</div>
                 </div>
-                <button class="btn btn-sm btn-success" @onclick="AsignarPaciente">
+                <button class="btn btn-sm btn-success" type="button" @onclick="AsignarPaciente">
                     Asignar
                 </button>
             </div>
         </div>
     }
-    else if (Buscado && !BuscandoPaciente && PacienteAsignado is null)
+    else if (Buscado && !BuscandoPaciente && PacienteAsignado is null && string.IsNullOrWhiteSpace(ErrorPacientes))
     {
         <div class="form-text mt-2">No se encontró paciente con ese DNI.</div>
-        <!-- opcional: botón crear paciente -->
-    }
-</div>
-
-
-<div class="mb-3">
-    <label class="form-label">Medicos</label>
-    @if (CargandoMedicos)
-    {
-        <div class="form-text">Cargando medicos...</div>
-    }
-    else
-    {
-        <select class="form-select" @bind="Model.MedicoId">
-            <option value="0" disabled>-- Seleccioná un medico --</option>
-
-            @foreach (var m in Medicos)
-            {
-                <option value="@m.Id">@m.Nombre</option>
-            }
-        </select>
-
-        @if (!string.IsNullOrWhiteSpace(ErrorMedicos))
-        {
-            <div class="text-danger mt-1">@ErrorMedicos</div>
-        }
     }
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Consultorios</label>
+    <label class="form-label">Consultorio</label>
+
     @if (CargandoConsultorios)
     {
         <div class="form-text">Cargando consultorios...</div>
     }
     else
     {
-        <select class="form-select" @bind="Model.ConsultorioId">
-            <option value="0" disabled>-- Seleccioná un consultorio --</option>
+        <select class="form-select" value="@Model.ConsultorioId" @onchange="OnConsultorioChanged">
+            <option value="0">-- Seleccioná un consultorio --</option>
 
             @foreach (var c in Consultorios)
             {
@@ -120,7 +97,43 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Estados</label>
+    <label class="form-label">Médico</label>
+
+    @if (Model.ConsultorioId == 0)
+    {
+        <div class="alert alert-light border mb-0">
+            Elegí primero un consultorio para ver los médicos disponibles.
+        </div>
+    }
+    else if (CargandoMedicos)
+    {
+        <div class="form-text">Cargando médicos...</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMedicos))
+    {
+        <div class="text-danger">@ErrorMedicos</div>
+    }
+    else if (Medicos.Count == 0)
+    {
+        <div class="alert alert-warning mb-0">
+            No hay médicos disponibles para el consultorio seleccionado.
+        </div>
+    }
+    else
+    {
+        <select class="form-select" @bind="Model.MedicoId">
+            <option value="0">-- Seleccioná un médico --</option>
+
+            @foreach (var m in Medicos)
+            {
+                <option value="@m.Id">@m.Apellido, @m.Nombre - @m.Especialidad</option>
+            }
+        </select>
+    }
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Estado</label>
     @if (CargandoEstados)
     {
         <div class="form-text">Cargando estados...</div>
@@ -134,7 +147,6 @@
             }
         </select>
 
-
         @if (!string.IsNullOrWhiteSpace(ErrorEstados))
         {
             <div class="text-danger mt-1">@ErrorEstados</div>
@@ -147,7 +159,7 @@
     <input class="form-control" type="datetime-local" @bind="Model.FechaLocal" />
 </div>
 
-<button class="btn btn-success" @onclick="Create" disabled="@Guardando">
+<button class="btn btn-success" type="button" @onclick="Create" disabled="@Guardando">
     @(Guardando ? "Guardando..." : "Crear")
 </button>
 
@@ -156,8 +168,6 @@
     private bool Guardando;
     private string? Nombre;
 
-
-
     private bool CargandoMedicos;
     private string? ErrorMedicos;
 
@@ -165,7 +175,6 @@
     private string? ErrorConsultorios;
 
     private bool CargandoEstados;
-    private int EstadoSeleccionadoId;
     private string? ErrorEstados;
 
     private string DniBusqueda = "";
@@ -176,17 +185,44 @@
     private PacienteSelectorResponse? ResultadoBusqueda;
     private PacienteSelectorResponse? PacienteAsignado;
 
-
-
     private CrearTurnoVm Model = new() { ConsultorioId = 0, EstadoId = 0, MedicoId = 0 };
+
     private List<ItemMedicos> Medicos = new();
     private List<ItemConsultorios> Consultorios = new();
     private List<ItemEstados> Estados = new();
 
-
     protected override async Task OnInitializedAsync()
     {
-        await Task.WhenAll(CargarMedicos(), CargarConsultorios(), CargarEstados());
+        // Secuencial para evitar problemas de DbContext concurrente
+        await CargarConsultorios();
+        await CargarEstados();
+        // No cargamos médicos todavía: depende del consultorio seleccionado
+    }
+
+    private async Task OnConsultorioChanged(ChangeEventArgs e)
+    {
+        Error = null;
+
+        if (!int.TryParse(e.Value?.ToString(), out var consultorioId))
+            consultorioId = 0;
+
+        await SeleccionarConsultorio(consultorioId);
+    }
+
+    private async Task SeleccionarConsultorio(int consultorioId)
+    {
+        var cambioConsultorio = Model.ConsultorioId != consultorioId;
+
+        Model.ConsultorioId = consultorioId;
+
+        if (cambioConsultorio)
+        {
+            Model.MedicoId = 0;   // reset dependiente
+            Medicos = new();
+            ErrorMedicos = null;
+        }
+
+        await CargarMedicos();
     }
 
     private async Task CargarMedicos()
@@ -196,11 +232,18 @@
 
         try
         {
-            var lista = await MedicosApi.ListarAsync(Nombre);
+            if (Model.ConsultorioId == 0)
+            {
+                Medicos = new();
+                return;
+            }
+
+            var lista = await MedicosService.ListarPorConsultorioAsync(Model.ConsultorioId);
 
             Medicos = lista
-                .Select(x => new ItemMedicos(x.Id, x.Nombre))
-                .OrderBy(x => x.Nombre)
+                .Select(x => new ItemMedicos(x.Id, x.Nombre, x.Apellido, x.Especialidad))
+                .OrderBy(x => x.Apellido)
+                .ThenBy(x => x.Nombre)
                 .ToList();
         }
         catch (Exception ex)
@@ -213,13 +256,15 @@
             CargandoMedicos = false;
         }
     }
+
     private async Task CargarConsultorios()
     {
         CargandoConsultorios = true;
         ErrorConsultorios = null;
+
         try
         {
-            var lista = await ConsultoriosApi.ListarAsync(Nombre);
+            var lista = await ConsultorioService.ListarAsync(Nombre);
 
             Consultorios = lista
                 .Select(x => new ItemConsultorios(x.Id, x.Institucion))
@@ -244,24 +289,25 @@
 
         try
         {
-            var lista = await EstadosApi.ListarAsync(Nombre);
+            var lista = await EstadoService.ListarAsync(Nombre);
 
-            var pendiente = lista.FirstOrDefault(x => x.Nombre.Equals("Pendiente", StringComparison.OrdinalIgnoreCase));
+            var pendiente = lista.FirstOrDefault(x =>
+                x.Nombre.Equals("Pendiente", StringComparison.OrdinalIgnoreCase));
 
-            if (pendiente is not null)
+            if (pendiente is null)
             {
-                // lo pongo primero y lo marco como seleccionado
-                Estados.Add(new ItemEstados(pendiente.Id, pendiente.Nombre));
-                Model.EstadoId = pendiente.Id;
+                ErrorEstados = "No existe el estado 'Pendiente'.";
+                Estados = new();
+                Model.EstadoId = 0;
+                return;
             }
-
 
             Estados = new List<ItemEstados>
             {
-            new ItemEstados(pendiente.Id, pendiente.Nombre)
+                new ItemEstados(pendiente.Id, pendiente.Nombre)
             };
 
-            EstadoSeleccionadoId = pendiente.Id;
+            Model.EstadoId = pendiente.Id;
         }
         catch (Exception ex)
         {
@@ -290,19 +336,18 @@
         BuscandoPaciente = true;
         try
         {
-            var p = await PacientesApi.GetIdByDniAsync(dni);
+            var p = await PacientesService.GetByDniAsync(dni);
 
             Buscado = true;
             ResultadoBusqueda = new PacienteSelectorResponse(
                 p.Id,
-                p.DNI,       // o p.DNI según tu DTO
+                p.DNI,
                 p.Nombre,
                 p.Apellido
             );
         }
         catch (Exception ex)
         {
-            // si tu API devuelve 404 cuando no existe, acá podés mapearlo a "no encontrado"
             ErrorPacientes = ex.Message;
             Buscado = true;
             ResultadoBusqueda = null;
@@ -313,15 +358,15 @@
         }
     }
 
-
     private void AsignarPaciente()
     {
         if (ResultadoBusqueda is null) return;
 
         PacienteAsignado = ResultadoBusqueda;
-        Model.PacienteId = ResultadoBusqueda.Id; // Guid? recomendado
+        Model.PacienteId = ResultadoBusqueda.Id;
 
         ResultadoBusqueda = null;
+        ErrorPacientes = null;
     }
 
     private void QuitarPaciente()
@@ -337,11 +382,10 @@
 
         try
         {
-
-            if (Model.MedicoId == 0) { Error = "Seleccioná un médico."; return; }
+            if (Model.PacienteId is null) { Error = "Asigná un paciente."; return; }
             if (Model.ConsultorioId == 0) { Error = "Seleccioná un consultorio."; return; }
-            if (Model.EstadoId == 0) { Error = "Seleccioná un estado."; return; }
-
+            if (Model.MedicoId == 0) { Error = "Seleccioná un médico."; return; }
+            if (Model.EstadoId == 0) { Error = "No se pudo asignar el estado inicial."; return; }
 
             var req = new CrearTurnoRequest
             {
@@ -352,11 +396,15 @@
                 FechaTurno = Model.FechaLocal
             };
 
-            await Api.CrearAsync(req);
+            await TurnosService.CrearAsync(req);
 
             Nav.NavigateTo("/turnos");
         }
         catch (TurnosApiException ex)
+        {
+            Error = ex.Message;
+        }
+        catch (Exception ex)
         {
             Error = ex.Message;
         }
@@ -365,8 +413,6 @@
             Guardando = false;
         }
     }
-
-
 
     private class CrearTurnoVm
     {
@@ -377,14 +423,8 @@
         public DateTime FechaLocal { get; set; } = DateTime.Now;
     }
 
-    private record ItemMedicos(int Id, string Nombre);
-
+    private record ItemMedicos(int Id, string Nombre, string Apellido, string Especialidad);
     private record ItemConsultorios(int Id, string Institucion);
-
     private record ItemEstados(int Id, string Nombre);
-
     private record PacienteSelectorResponse(Guid Id, string DNI, string Nombre, string Apellido);
-
-
-
 }

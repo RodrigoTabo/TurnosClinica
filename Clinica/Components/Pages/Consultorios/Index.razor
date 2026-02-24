@@ -1,10 +1,13 @@
 ﻿@page "/consultorios"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Consultorios
-@using TurnosClinica.ApiClients.Consultorios
-@inject ConsultoriosApiClient Api
+@using TurnosClinica.Application.Services.Consultorios
+@inject IConsultorioService ConsultorioService
 @using Microsoft.JSInterop
+@using TurnosClinica.Domain.Entities
 @inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles = "Admin,Recepcionista")]
 
 
 <div class="admin-page">
@@ -141,14 +144,15 @@
 
 @code {
 
-    private List<ConsultorioResponse> Consultorios = new ();
+    private List<ConsultorioResponse> Consultorios = new();
     private bool Cargando;
     private string? Error;
     public string? Nombre;
 
     private async Task Limpiar()
     {
-        Nombre = "";
+        Nombre = null;
+        Error = null;
         await Cargar();
     }
 
@@ -159,7 +163,7 @@
         Cargando = true;
         try
         {
-            Consultorios = await Api.ListarAsync(Nombre);
+            Consultorios = await ConsultorioService.ListarAsync(Nombre);
         }
         catch (Exception ex)
         {
@@ -175,9 +179,10 @@
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar la ciudad #{id}?"))
             return;
+        Error = null;
         try
         {
-            await Api.SoftDeleteAsync(id);
+            await ConsultorioService.SoftDeleteAsync(id);
             await Cargar();
         }
         catch (Exception ex)

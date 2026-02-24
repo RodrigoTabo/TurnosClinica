@@ -1,0 +1,60 @@
+﻿@page "/turnos/verificar"
+@using Microsoft.AspNetCore.WebUtilities
+@using TurnosClinica.Application.Services.Turnos
+@inject NavigationManager Nav
+@inject ITurnosService TurnosService
+
+<h3>Confirmación de turno</h3>
+
+@if (Cargando)
+{
+    <div class="alert alert-light border">Verificando turno...</div>
+}
+else if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+else if (!string.IsNullOrWhiteSpace(Mensaje))
+{
+    <div class="alert alert-success">@Mensaje</div>
+}
+
+@code {
+    private bool Cargando = true;
+    private string? Error;
+    private string? Mensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uri = Nav.ToAbsoluteUri(Nav.Uri);
+            var query = QueryHelpers.ParseQuery(uri.Query);
+
+            if (!query.TryGetValue("turnoId", out var turnoIdRaw) ||
+                !int.TryParse(turnoIdRaw, out var turnoId))
+            {
+                Error = "El enlace no es válido (turnoId).";
+                return;
+            }
+
+            if (!query.TryGetValue("token", out var token) ||
+                string.IsNullOrWhiteSpace(token))
+            {
+                Error = "El enlace no es válido (token).";
+                return;
+            }
+
+            await TurnosService.VerificarTurnoAsync(turnoId, token!);
+            Mensaje = "Tu turno fue confirmado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+}

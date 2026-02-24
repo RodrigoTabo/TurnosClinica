@@ -1,8 +1,10 @@
 ﻿@page "/paises"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Paises
-@using TurnosClinica.ApiClients.Paises
-@inject PaisesApiClient Api
+@using TurnosClinica.Application.Services.Paises
+@inject IPaisesService PaisesService
+@attribute [Authorize(Roles = "Admin")]
 @using Microsoft.JSInterop
 @inject IJSRuntime JsRuntime
 
@@ -137,11 +139,11 @@
     private List<PaisResponse> Paises = new();
     private bool Cargando;
     private string? Error;
-    private string? Nombre = "";
+    private string? Nombre;
 
     private async Task Limpiar()
     {
-        Nombre = "";
+        Nombre = null;
         await Cargar();
     }
 
@@ -152,7 +154,7 @@
 
         try
         {
-            Paises = await Api.ListarAsync(Nombre);
+            Paises = await PaisesService.ListarAsync(Nombre);
         }
         catch (Exception ex)
         {
@@ -169,9 +171,10 @@
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar el país #{id}?"))
             return;
+        Error = null;
         try
         {
-            await Api.SoftDeleteAsync(id);
+            await PaisesService.SoftDeleteAsync(id);
             await Cargar();
         }
         catch (Exception ex)

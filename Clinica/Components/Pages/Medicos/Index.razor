@@ -1,9 +1,11 @@
 ﻿@page "/medicos"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Medicos
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Medicos
-@inject MedicosApiClient Api
 @using Microsoft.JSInterop
+@using TurnosClinica.Application.Services.Medicos
+@inject IMedicosService MedicosService
+@attribute [Authorize(Roles = "Admin, Recepcionista")]
 @inject IJSRuntime JsRuntime
 
 <div class="admin-page">
@@ -71,6 +73,7 @@
                                 <th class="py-3 text-uppercase small fw-bold text-secondary">Nombre</th>
                                 <th class="py-3 text-uppercase small fw-bold text-secondary">Apellido</th>
                                 <th class="py-3 text-uppercase small fw-bold text-secondary">Especialidad</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Consultorio</th>
                                 <th class="py-3 text-uppercase small fw-bold text-secondary text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -98,6 +101,7 @@
                                         <td class="text-muted">@c.Nombre</td>
                                         <td class="text-muted">@c.Apellido</td>
                                         <td class="text-muted">@c.Especialidad</td>
+                                        <td class="text-muted">@c.Consultorio</td>
 
                                         <td class="text-center">
                                             <div class="btn-group paises-actions" role="group">
@@ -146,7 +150,8 @@
 
     private async Task Limpiar()
     {
-        Nombre = "";
+        Nombre = null;
+        Error = null;
         await Cargar();
     }
 
@@ -157,7 +162,7 @@
 
         try
         {
-            Medicos = await Api.ListarAsync(Nombre);
+            Medicos = await MedicosService.ListarAsync(Nombre);
         }
         catch (Exception ex)
         {
@@ -175,9 +180,10 @@
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar la ciudad #{id}?"))
             return;
+        Error = null;
         try
         {
-            await Api.SoftDeleteAsync(id);
+            await MedicosService.SoftDeleteAsync(id);
             await Cargar();
         }
         catch (Exception ex)

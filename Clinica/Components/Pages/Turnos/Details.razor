@@ -1,10 +1,12 @@
 ﻿@page "/turnos/details/{Id:int}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Consultorios
-@using TurnosClinica.ApiClients.Turnos
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Turnos
-@inject TurnosApiClient TurnosApiClient
-@inject ConsultoriosApiClient ConsultoriosApi
+@using TurnosClinica.Application.Services.Consultorios
+@using TurnosClinica.Application.Services.Turnos
+@inject IConsultorioService ConsultorioService
+@inject ITurnosService TurnosService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -267,7 +269,7 @@
 
         try
         {
-            Turnos = await TurnosApiClient.GetByIdAsync(Id);
+            Turnos = await TurnosService.GetByIdAsync(Id);
 
             if (Turnos is not null)
             {
@@ -299,7 +301,7 @@
 
         try
         {
-            var lista = await ConsultoriosApi.ListarAsync(Nombre);
+            var lista = await ConsultorioService.ListarAsync(Nombre);
 
             Consultorios = lista
                 .Select(x => new ItemConsultorios(x.Id, x.Institucion))
@@ -351,9 +353,9 @@
             if (Model.ConsultorioId <= 0)
                 throw new InvalidOperationException("Seleccioná un consultorio.");
 
-            await TurnosApiClient.UpdateAsync(Id, Model);
+            await TurnosService.UpdateAsync(Id, Model);
 
-            Turnos = await TurnosApiClient.GetByIdAsync(Id);
+            Turnos = await TurnosService.GetByIdAsync(Id);
 
             if (Turnos is not null)
             {

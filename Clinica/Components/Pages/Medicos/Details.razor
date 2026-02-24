@@ -1,10 +1,16 @@
 ﻿@page "/medicos/details/{Id:int}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Medicos
-@using TurnosClinica.ApiClients.Especialidades
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Medicos
-@inject MedicosApiClient MedicosApiClient
-@inject EspecialidadesApiClient EspecialidadesApiClient
+@using TurnosClinica.Application.DTOs.Especialidades
+@using TurnosClinica.Application.DTOs.Consultorios
+@using TurnosClinica.Application.Services.Especialidades
+@using TurnosClinica.Application.Services.Medicos
+@using TurnosClinica.Application.Services.Consultorios
+@inject IMedicosService MedicosService
+@inject IEspecialidadesService EspecialidadesService
+@inject IConsultorioService ConsultorioService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -68,6 +74,7 @@
                                         <th class="text-muted text-nowrap">Nombre</th>
                                         <th class="text-muted text-nowrap">Apellido</th>
                                         <th class="text-muted text-nowrap">Especialidad</th>
+                                        <th class="text-muted text-nowrap">Consultorios</th>
                                     </tr>
                                 </thead>
 
@@ -160,6 +167,37 @@
                                                 }
                                             }
                                         </td>
+                                        <td style="min-width:0;">
+                                            @if (!Editando)
+                                            {
+                                                <span class="value-text d-inline-block text-truncate" style="max-width:100%;">
+                                                    @Medico.Consultorio
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @if (!string.IsNullOrWhiteSpace(ErrorConsultorios))
+                                                {
+                                                    <div class="alert alert-danger py-2 mb-2">@ErrorConsultorios</div>
+                                                }
+
+                                                <InputSelect class="form-select form-select-sm"
+                                                             style="width:100%;"
+                                                             @bind-Value="Model.ConsultorioId"
+                                                             disabled="@Guardando">
+                                                    <option value="0" disabled>-- Seleccioná un Consultorio --</option>
+                                                    @foreach (var p in Consultorios)
+                                                    {
+                                                        <option value="@p.Id">@p.Nombre</option>
+                                                    }
+                                                </InputSelect>
+
+                                                @if (CargandoConsultorios)
+                                                {
+                                                    <div class="text-muted small mt-1">Cargando Consultorios...</div>
+                                                }
+                                            }
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -222,6 +260,10 @@
     private string? ErrorEspecialidades;
     private List<ItemEspecialidades> Especialidades = new();
 
+    private bool CargandoConsultorios = false;
+    private string? ErrorConsultorios;
+    private List<ItemConsultorios> Consultorios = new();
+
     protected override async Task OnParametersSetAsync()
     {
         await Cargar();
@@ -234,7 +276,7 @@
 
         try
         {
-            Medico = await MedicosApiClient.GetByIdAsync(Id);
+            Medico = await MedicosService.GetByIdAsync(Id);
 
             if (Medico is not null)
             {
@@ -242,6 +284,7 @@
                 Model.Nombre = Medico.Nombre;
                 Model.Apellido = Medico.Apellido;
                 Model.EspecialidadId = Medico.EspecialidadId;
+                Model.ConsultorioId = Medico.ConsultorioId;
             }
 
             if (Especialidades.Count == 0 && !CargandoEspecialidades)
@@ -265,7 +308,7 @@
 
         try
         {
-            var lista = await EspecialidadesApiClient.ListarAsync(Nombre);
+            var lista = await EspecialidadesService.ListarAsync(Nombre);
 
             Especialidades = lista
                 .Select(x => new ItemEspecialidades(x.Id, x.Nombre))
@@ -282,6 +325,30 @@
             CargandoEspecialidades = false;
         }
     }
+    private async Task CargarConsultorio()
+    {
+        CargandoConsultorios = true;
+        ErrorConsultorios = null;
+
+        try
+        {
+            var lista = await ConsultorioService.ListarAsync(Nombre);
+
+            Consultorios = lista
+                .Select(x => new ItemConsultorios(x.Id, x.Institucion))
+                .OrderBy(x => x.Nombre)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorEspecialidades = ex.Message;
+            Consultorios = new();
+        }
+        finally
+        {
+            CargandoConsultorios = false;
+        }
+    }
 
     private async Task EntrarEdicion()
     {
@@ -292,9 +359,12 @@
         Model.Nombre = Medico.Nombre;
         Model.Apellido = Medico.Apellido;
         Model.EspecialidadId = Medico.EspecialidadId;
+        Model.ConsultorioId = Medico.ConsultorioId;
 
         if (Especialidades.Count == 0 && !CargandoEspecialidades)
             await CargarEspecialidades();
+        if (Consultorios.Count == 0 && !CargandoConsultorios)
+            await CargarConsultorio();
     }
 
 
@@ -315,9 +385,9 @@
             if (Model.EspecialidadId <= 0)
                 throw new InvalidOperationException("Seleccioná una Especialidad.");
 
-            await MedicosApiClient.UpdateAsync(Id, Model);
+            await MedicosService.UpdateAsync(Id, Model);
 
-            Medico = await MedicosApiClient.GetByIdAsync(Id);
+            Medico = await MedicosService.GetByIdAsync(Id);
 
             if (Medico is not null)
             {
@@ -325,6 +395,7 @@
                 Model.Nombre = Medico.Nombre;
                 Model.Apellido = Medico.Apellido;
                 Model.EspecialidadId = Medico.EspecialidadId;
+                Model.ConsultorioId = Medico.ConsultorioId;
             }
 
             Editando = false;
@@ -349,10 +420,12 @@
             Model.Nombre = Medico.Nombre;
             Model.Apellido = Medico.Apellido;
             Model.EspecialidadId = Medico.EspecialidadId;
+            Model.ConsultorioId = Medico.ConsultorioId;
         }
     }
 
     private record ItemEspecialidades(int Id, string Nombre);
+    private record ItemConsultorios(int Id, string Nombre);
 
     private void Volver() => Nav.NavigateTo("/medicos");
 }

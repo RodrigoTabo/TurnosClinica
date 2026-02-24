@@ -1,7 +1,9 @@
 ﻿@page "/panel"
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Panel
 @using TurnosClinica.Application.Services.Panel
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin, Recepcionista, Medicos")]
 @inject IDashboardService Dashboard
 
 

@@ -9,9 +9,10 @@
         public int DNI { get; set; }
         public int EspecialidadId { get; set; }
         public Especialidad Especialidad { get; set; }
-
         public List<Turno> Turnos { get; set; } = new();
         public bool Activo { get; set; }
+        public int ConsultorioId { get; set; }
+        public Consultorio Consultorio { get; set; }
 
         public DateTime? EliminadoEn { get; set; }
 

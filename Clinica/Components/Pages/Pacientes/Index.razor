@@ -1,8 +1,10 @@
 ﻿@page "/pacientes"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Pacientes
-@using TurnosClinica.ApiClients.Pacientes
-@inject PacientesApiClient Api
+@using TurnosClinica.Application.Services.Pacientes
+@inject IPacientesService PacientesService
+@attribute [Authorize(Roles = "Admin, Recepcionista")]
 @using Microsoft.JSInterop
 @inject IJSRuntime JsRuntime
 
@@ -148,9 +150,10 @@
 
     public async Task Limpiar()
     {
-        Nombre = "";
-        Apellido = "";
-        DNI = "";
+        Nombre = null;
+        Apellido = null;
+        DNI = null;
+        Error = null;
         await Cargar();
     }
 
@@ -161,7 +164,7 @@
         Cargando = true;
         try
         {
-            Pacientes = await Api.ListarAsync(DNI, Nombre, Apellido);
+            Pacientes = await PacientesService.ListarAsync(DNI, Nombre, Apellido);
         }
         catch (Exception ex)
         {
@@ -177,9 +180,10 @@
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar el paciente #{id}?"))
             return;
+        Error = null;
         try
         {
-            await Api.SoftDeleteAsync(id);
+            await PacientesService.SoftDeleteAsync(id);
             await Cargar();
         }
         catch (Exception ex)

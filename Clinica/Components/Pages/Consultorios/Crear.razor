@@ -1,11 +1,14 @@
 ﻿@page "/consultorios/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Consultorios
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Consultorios
-@using TurnosClinica.ApiClients.Ciudades
 @using TurnosClinica.Application.DTOs.Ciudades
-@inject ConsultoriosApiClient Api
-@inject CiudadesApiClient CiudadesApi
+@using TurnosClinica.Application.Services.Ciudades
+@using TurnosClinica.Application.Services.Consultorios
+@using TurnosClinica.Domain.Entities
+@inject IConsultorioService ConsultorioService
+@inject ICiudadService CiudadService
+@attribute [Authorize(Roles = Roles.Admin)]
 @inject NavigationManager Nav
 
 
@@ -148,7 +151,7 @@
 
         try
         {
-            var lista = await CiudadesApi.ListarAsync(Nombre);
+            var lista = await CiudadService.ListarAsync(Nombre);
 
             Ciudades = lista
                 .Select(x => new ItemCiudades(x.Id, x.Nombre, x.Provincia))
@@ -195,7 +198,7 @@
                 CiudadId = Model.CiudadId
             };
 
-            await Api.CrearAsync(req);
+            await ConsultorioService.CrearAsync(req);
             Nav.NavigateTo("/consultorios");
         }
         catch (Exception ex)

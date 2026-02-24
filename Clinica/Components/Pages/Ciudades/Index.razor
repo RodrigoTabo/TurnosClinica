@@ -1,9 +1,12 @@
 ﻿@page "/ciudades"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Ciudades
-@using TurnosClinica.ApiClients.Ciudades
-@inject CiudadesApiClient Api
+@inject ICiudadService CiudadService
+@attribute [Authorize(Roles = "Admin")]
 @using Microsoft.JSInterop
+@using TurnosClinica.Application.Services.Ciudades
+@using TurnosClinica.Domain.Entities
 @inject IJSRuntime JsRuntime
 
 <div class="admin-page">
@@ -141,7 +144,8 @@
 
     private async Task Limpiar()
     {
-        Nombre = "";
+        Nombre = null;
+        Error = null;
         await Cargar();
     }
 
@@ -151,7 +155,7 @@
         Cargando = true;
         try
         {
-            Ciudades = await Api.ListarAsync(Nombre);
+            Ciudades = await CiudadService.ListarAsync(Nombre);
         }
         catch (Exception ex)
         {
@@ -167,9 +171,10 @@
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar la ciudad #{id}?"))
             return;
+        Error = null;
         try
         {
-            await Api.SoftDeleteAsync(id);
+            await CiudadService.SoftDeleteAsync(id);
             await Cargar();
         }
         catch (Exception ex)

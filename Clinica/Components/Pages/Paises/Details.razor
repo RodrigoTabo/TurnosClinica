@@ -1,8 +1,10 @@
 ﻿@page "/paises/details/{Id:int}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Paises
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Paises
-@inject PaisesApiClient PaisesClient
+@using TurnosClinica.Application.Services.Paises
+@inject IPaisesService PaisesService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -138,7 +140,7 @@
 
         try
         {
-            Pais = await PaisesClient.GetByIdAsync(Id);
+            Pais = await PaisesService.GetByIdAsync(Id);
             if (Pais is not null)
                 Model.Nombre = Pais.Nombre;
         }
@@ -172,9 +174,9 @@
             // guardamos tal cual esté (trim) y el server valida
             Model.Nombre = (Model.Nombre ?? "").Trim();
 
-            await PaisesClient.UpdateAsync(Id, Model);
+            await PaisesService.UpdateAsync(Id, Model);
 
-            Pais = await PaisesClient.GetByIdAsync(Id);
+            Pais = await PaisesService.GetByIdAsync(Id);
             if (Pais is not null)
                 Model.Nombre = Pais.Nombre;
 

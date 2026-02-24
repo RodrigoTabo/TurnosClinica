@@ -1,9 +1,12 @@
 ﻿@page "/turnos"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.ApiClients.Turnos
 @using TurnosClinica.Application.DTOs.Turnos
-@inject TurnosApiClient Api
 @using Microsoft.JSInterop
+@using TurnosClinica.Application.Services.Turnos
+@inject ITurnosService TurnosService
+@attribute [Authorize(Roles = "Admin, Recepcionista")]
 @inject IJSRuntime JsRuntime
 
 <div class="d-flex gap-2 align-items-end mb-3">
@@ -84,6 +87,7 @@
                                 <th class="py-3 text-uppercase small fw-bold text-secondary">PacienteNombreCompleto</th>
                                 <th class="py-3 text-uppercase small fw-bold text-secondary">MedicoNombreCompleto</th>
                                 <th class="py-3 text-uppercase small fw-bold text-secondary">Consultorio</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Estado</th>
                                 <th class="py-3 text-uppercase small fw-bold text-secondary">Pago</th>
                                 <th class="py-3 text-uppercase small fw-bold text-secondary text-center">Acciones</th>
                             </tr>
@@ -112,6 +116,7 @@
                                         <td class="text-muted">@c.PacienteNombreCompleto</td>
                                         <td class="text-muted">@c.MedicoNombreCompleto</td>
                                         <td class="text-muted">@c.Consultorio</td>
+                                        <td class="text-muted">@c.Estado</td>
                                         <td class="text-muted">@(c.TienePago ? "Sí" : "No")</td>
 
                                         <td class="text-center">
@@ -168,7 +173,7 @@
         Cargando = true;
         try
         {
-            Turnos = await Api.ListarAsync(DesdeLocal, HastaLocal);
+            Turnos = await TurnosService.ListarAsync(DesdeLocal, HastaLocal);
         }
         catch (TurnosApiException ex)
         {
@@ -184,9 +189,10 @@
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar la ciudad #{id}?"))
             return;
+        Error = null;
         try
         {
-            await Api.SoftDeleteAsync(id);
+            await TurnosService.SoftDeleteAsync(id);
             await Cargar();
         }
         catch (Exception ex)

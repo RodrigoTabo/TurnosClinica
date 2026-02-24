@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TurnosClinica.Application.DTOs.Especialidades;
 using TurnosClinica.Application.Services.Especialidades;
 
 namespace TurnosClinica.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class EspecialidadesController : ControllerBase

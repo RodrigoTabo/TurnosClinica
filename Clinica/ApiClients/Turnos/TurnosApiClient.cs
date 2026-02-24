@@ -3,6 +3,7 @@
     using System.Net.Http.Json;
     using TurnosClinica.ApiClients.Common;
     using TurnosClinica.Application.DTOs.Turnos;
+    using TurnosClinica.Models;
 
     public class TurnosApiClient
     {
@@ -47,6 +48,15 @@
 
         public async Task SoftDeleteAsync(int id)
             => await _http.DeleteOrThrowAsync($"api/turnos/{id}");
+
+        public async Task<int> CrearAsegurandoPacienteAsync(CrearTurnoConPacienteRequest request)
+        {
+            var created = await _http.PostJsonOrThrowAsync<CrearTurnoConPacienteRequest, CreatedIdResponse>("api/turnos/crear-asegurando-paciente", request);
+            return created.Id;
+        }
+
+        public async Task<List<TimeSpan>> ObtenerDisponiblesAsync(int medicoId,int consultorioId, DateOnly fecha)
+            => await _http.GetJsonOrThrowAsync<List<TimeSpan>>("api/turnos/disponibles");
 
         private class CreatedIdResponse
         {

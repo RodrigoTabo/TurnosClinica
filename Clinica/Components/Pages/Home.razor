@@ -1,7 +1,298 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using TurnosClinica.Application.DTOs.Medicos
+@using TurnosClinica.Application.Services.Medicos
+@inject IMedicosService MedicosService
+@inject NavigationManager Nav
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<main>
+    <!-- Hero -->
+    <section class="px-3 py-5">
+        <div class="row align-items-center g-4 g-md-5">
+            <div class="col-12 col-md-6">
+                <div class="w-100 rounded-4 border shadow-lg"
+                     style="
+            aspect-ratio: 16 / 9;
+            background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAU1-MUbSkjJlvvF70q04D9RH0i0Nrl6HDTxMEEt3Kbi_fAJLQDBgyn_ja8jLMxsTHUuU4lYWk8w-5ErhT3a-1TH6eYuPn7WxCr49sLVyUU0tI6UBeEUziPBqUXjF5P4JUHXZ3scms7XvosI809sP-o3anLIngb0OI4LymrFHtosiues7ow9CGfdkgcMUxh5FXC9pmIGnIgvR7wzqu3lNYbcfbREmIZN_ilc_aY7hKez51pk48l9cXudwENPVhsIuPeQIn-CG2ZJRE');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+          "
+                     data-alt="Modern bright medical clinic reception lobby area">
+                </div>
+            </div>
 
-Welcome to your new app.
+            <div class="col-12 col-md-6">
+                <div class="d-flex flex-column gap-4">
+                    <div class="d-flex flex-column gap-3 text-start">
+                        <h1 class="display-5 fw-bold lh-sm mb-0">
+                            Atención compasiva para <span class="text-primary">una vida más saludable</span>
+                        </h1>
+                        <p class="text-secondary fs-6 fs-md-5 mb-0">
+                            Disfrute de una atención médica de primer nivel con nuestro equipo de especialistas dedicados.
+                            Desde exámenes preventivos hasta tratamientos avanzados, su salud es nuestra máxima prioridad.
+                        </p>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2">
+                        <NavLink href="/registrarturno" class="btn btn-primary btn-lg fw-bold w-100">
+                            Reservar Cita
+                        </NavLink>
+                        <button class="btn btn-outline-primary btn-lg fw-bold w-100">
+                            Leer más
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* <!-- Search -->
+    <section class="px-3 py-3">
+        <div class="bg-white border rounded-4 shadow-sm p-2">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-transparent border-0 text-secondary">
+                    <span class="material-symbols-outlined">search</span>
+                </span>
+                <input type="text"
+                       class="form-control border-0 shadow-none"
+                       placeholder="Busqueda para doctores, especialistas y consulorios mas cercanos..."
+                       value="" />
+                <button class="btn btn-primary rounded-3 fw-bold px-4 m-1" type="button">
+                    Buscar
+                </button>
+            </div>
+        </div>
+    </section> *@
+
+    <!-- Services -->
+    <section class="px-3 py-5">
+        <div class="d-flex justify-content-between align-items-end mb-4 gap-3 flex-wrap">
+            <div>
+                <h2 class="h2 fw-bold mb-1">Nuestros Servicios</h2>
+                <p class="text-secondary mb-0">Atención médica integral adaptada a sus necesidades</p>
+            </div>
+
+            <a class="text-primary fw-bold text-decoration-none d-inline-flex align-items-center gap-1" href="#">
+                View all
+                <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <article class="h-100 border rounded-4 p-4 bg-white shadow-sm">
+                    <div class="rounded-3 bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+                        <span class="material-symbols-outlined">stethoscope</span>
+                    </div>
+                    <h3 class="h5 fw-bold mb-2">Medico General</h3>
+                    <p class="text-secondary small mb-0">
+                        Chequeos de rutina, vacunaciones y manejo de enfermedades crónicas.
+                    </p>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <article class="h-100 border rounded-4 p-4 bg-white shadow-sm">
+                    <div class="rounded-3 bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+                        <span class="material-symbols-outlined">child_care</span>
+                    </div>
+                    <h3 class="h5 fw-bold mb-2">Pediatras</h3>
+                    <p class="text-secondary small mb-0">
+                        Atención médica especializada para bebés, niños y adolescentes.
+                    </p>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <article class="h-100 border rounded-4 p-4 bg-white shadow-sm">
+                    <div class="rounded-3 bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+                        <span class="material-symbols-outlined">favorite</span>
+                    </div>
+                    <h3 class="h5 fw-bold mb-2">Cardiologo</h3>
+                    <p class="text-secondary small mb-0">
+                        Atención experta para enfermedades cardíacas y salud vascular.
+                    </p>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <article class="h-100 border rounded-4 p-4 bg-white shadow-sm">
+                    <div class="rounded-3 bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+                        <span class="material-symbols-outlined">orthopedics</span>
+                    </div>
+                    <h3 class="h5 fw-bold mb-2">Ortopedia</h3>
+                    <p class="text-secondary small mb-0">
+                        Tratamientos avanzados para trastornos de huesos, articulaciones y músculos.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    @{
+        var gruposMedicos = Medicos?.Chunk(3).ToList() ?? new List<MedicoResponse[]>();
+    }
+
+    <!-- Doctors -->
+    <section class="px-3 py-5">
+        <div class="bg-white border rounded-5 p-4 p-md-5 shadow-sm">
+            <div class="text-center mb-5">
+                <h2 class="h2 fw-bold mb-2">Conozca a nuestros especialistas</h2>
+                <p class="text-secondary mx-auto mb-0" style="max-width: 700px;">
+                    Nuestro equipo de médicos certificados se dedica a brindarle atención médica y experiencia de la más alta calidad.
+                </p>
+            </div>
+
+            @if (gruposMedicos.Count == 0)
+            {
+                <div class="text-center text-secondary">
+                    No hay médicos disponibles.
+                </div>
+            }
+            else
+            {
+                <div id="doctoresCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <!-- indicadores -->
+                    <div class="carousel-indicators mb-0">
+                        @for (int i = 0; i < gruposMedicos.Count; i++)
+                        {
+                            <button type="button"
+                                    data-bs-target="#doctoresCarousel"
+                                    data-bs-slide-to="@i"
+                                    class="@(i == 0 ? "active" : null)"
+                                    aria-current="@(i == 0 ? "true" : null)"
+                                    aria-label="Slide @(i + 1)">
+                            </button>
+                        }
+                    </div>
+
+                    <!-- slides -->
+                    <div class="carousel-inner pb-4">
+                        @for (int i = 0; i < gruposMedicos.Count; i++)
+                        {
+                            var grupo = gruposMedicos[i];
+
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <div class="row g-4 g-md-5 justify-content-center px-4 px-md-5">
+                                    @foreach (var m in grupo)
+                                    {
+                                        <div class="col-12 col-sm-6 col-lg-4">
+                                            <article class="text-center h-100 doctor-card">
+                                                <div class="mx-auto mb-4 rounded-circle overflow-hidden border border-4 border-primary border-opacity-10 shadow"
+                                                     style="width: 190px; height: 190px;">
+                                                    <img class="w-100 h-100 object-fit-cover"
+                                                         alt="Médico"
+                                                         src="https://clipart-library.com/2024/cartoon-images-of-doctors/cartoon-images-of-doctors-0.png" />
+                                                </div>
+
+                                                <h4 class="h5 fw-bold mb-1">@m.Nombre @m.Apellido</h4>
+                                                <p class="text-primary fw-medium small mb-0">@m.Especialidad</p>
+                                            </article>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- controles -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#doctoresCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon rounded-circle bg-dark bg-opacity-50 p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+
+                    <button class="carousel-control-next" type="button" data-bs-target="#doctoresCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon rounded-circle bg-dark bg-opacity-50 p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Quick Access -->
+    <section class="px-3 py-5">
+        <div class="row g-4">
+            <div class="col-12 col-md-6">
+                <article class="position-relative overflow-hidden rounded-4 p-4 p-md-5 bg-primary text-white h-100">
+                    <div class="position-relative" style="z-index: 2;">
+                        <h3 class="h3 fw-bold mb-2">¿Necesita atención urgente?</h3>
+                        <p class="mb-4 text-white-50" style="max-width: 260px;">
+                            Comuníquese con nuestra unidad de respuesta a emergencias las 24 horas, los 7 días de la semana para obtener asistencia inmediata.
+                        </p>
+                        <a class="btn btn-light text-primary fw-bold d-inline-flex align-items-center gap-2 px-4 py-2 rounded-3" href="tel:+1234567890">
+                            <span class="material-symbols-outlined">call</span>
+                            (555) 123-4567
+                        </a>
+                    </div>
+
+                    <span class="material-symbols-outlined position-absolute"
+                          style="right: -10px; bottom: -10px; font-size: 140px; opacity: .18;">
+                        emergency
+                    </span>
+                </article>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <article class="position-relative overflow-hidden rounded-4 p-4 p-md-5 border bg-white h-100">
+                    <div class="position-relative" style="z-index: 2;">
+                        <h3 class="h3 fw-bold mb-2">Visítanos</h3>
+                        <p class="text-secondary mb-4" style="max-width: 260px;">
+                           Mercedes, Buenos Aires, Argentina.
+                           Calle 12 entre 33 y 35.
+                        </p>
+                        <a class="btn btn-primary fw-bold d-inline-flex align-items-center gap-2 px-4 py-2 rounded-3" href="#">
+                            <span class="material-symbols-outlined">map</span>
+                            Open in Maps
+                        </a>
+                    </div>
+
+                    <div class="position-absolute top-0 end-0 h-100"
+                         style="width: 33%; opacity: .9;">
+                        <img class="w-100 h-100 object-fit-cover"
+                             data-alt="Abstract map layout with blue highlights"
+                             data-location="Central City"
+                             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxNmYbSoVcUIu5_bu0dQ9Ga_RGEZ6i2W7Z9w&s" />
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+@code {
+    private List<MedicoResponse> Medicos = new();
+    private bool CargandoMedicos;
+    private string? ErrorMedicos;
+    private string? Nombre;
+
+    private async Task CargarMedicos()
+    {
+        CargandoMedicos = true;
+        ErrorMedicos = null;
+
+        try
+        {
+            Medicos = await MedicosService.ListarAsync(Nombre);
+        }
+        catch (Exception ex)
+        {
+            ErrorMedicos = ex.Message;
+            Medicos = new();
+        }
+        finally
+        {
+            CargandoMedicos = false;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarMedicos();
+    }
+}
+

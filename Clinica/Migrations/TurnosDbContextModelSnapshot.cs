@@ -393,6 +393,9 @@ namespace TurnosClinica.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ConsultorioId")
+                        .HasColumnType("int");
+
                     b.Property<int>("DNI")
                         .HasColumnType("int");
 
@@ -407,6 +410,8 @@ namespace TurnosClinica.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ConsultorioId");
 
                     b.HasIndex("DNI")
                         .IsUnique();
@@ -647,6 +652,15 @@ namespace TurnosClinica.Migrations
                     b.Property<Guid>("PacienteId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("TokenConfirmacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("TokenConfirmacionExpiraEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("VerificadoEn")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EstadoId");
@@ -751,11 +765,19 @@ namespace TurnosClinica.Migrations
 
             modelBuilder.Entity("TurnosClinica.Models.Medico", b =>
                 {
+                    b.HasOne("TurnosClinica.Models.Consultorio", "Consultorio")
+                        .WithMany("Medicos")
+                        .HasForeignKey("ConsultorioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("TurnosClinica.Models.Especialidad", "Especialidad")
                         .WithMany("Medicos")
                         .HasForeignKey("EspecialidadId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Consultorio");
 
                     b.Navigation("Especialidad");
                 });
@@ -862,6 +884,8 @@ namespace TurnosClinica.Migrations
 
             modelBuilder.Entity("TurnosClinica.Models.Consultorio", b =>
                 {
+                    b.Navigation("Medicos");
+
                     b.Navigation("Turnos");
                 });
 

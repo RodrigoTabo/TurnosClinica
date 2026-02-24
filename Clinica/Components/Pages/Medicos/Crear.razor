@@ -1,11 +1,15 @@
 ﻿@page "/medicos/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Medicos
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Medicos
-@using TurnosClinica.ApiClients.Especialidades
 @using TurnosClinica.Application.DTOs.Especialidades
-@inject MedicosApiClient Api
-@inject EspecialidadesApiClient EspecialidadApi
+@using TurnosClinica.Application.Services.Consultorios
+@using TurnosClinica.Application.Services.Especialidades
+@using TurnosClinica.Application.Services.Medicos
+@inject IMedicosService MedicosService
+@inject IEspecialidadesService EspecialidadesService
+@inject IConsultorioService ConsultorioService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 
@@ -95,6 +99,34 @@
                                 <div class="form-hint">Elegí la Especialidad que le pertenezca al Medico </div>
                             }
                         </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Consultorios</label>
+
+                            @if (CargandoConsultorios)
+                            {
+                                <div class="form-text">Cargando Consultorios...</div>
+                            }
+                            else
+                            {
+                                @if (!string.IsNullOrWhiteSpace(ErrorConsultorios))
+                                {
+                                    <div class="alert alert-danger py-2 mb-2">@ErrorConsultorios</div>
+                                }
+
+                                <select class="form-select"
+                                        @bind="Model.ConsultoriosId"
+                                        disabled="@Guardando">
+                                    <option value="0" disabled>-- Seleccioná un Consultorio --</option>
+
+                                    @foreach (var p in Consultorios)
+                                    {
+                                        <option value="@p.Id">@p.Nombre</option>
+                                    }
+                                </select>
+
+                                <div class="form-hint">Elegí el consultorio que le pertenezca al Medico </div>
+                            }
+                        </div>
                     </div>
                 </div>
 
@@ -131,14 +163,18 @@
 
     private bool CargandoEspecialidades = true;
     private string? ErrorEspecialidades;
+    private bool CargandoConsultorios = true;
+    private string? ErrorConsultorios;
 
-    private CrearMedicosVM Model = new() { EspecialidadId = 0 };
+    private CrearMedicosVM Model = new() { EspecialidadId = 0, ConsultoriosId = 0 };
     private List<ItemEspecialidades> Especialidades = new();
+    private List<ItemConsultorios> Consultorios = new();
 
 
     protected override async Task OnInitializedAsync()
     {
         await CargarEspecialidades();
+        await CargarConsultorios();
     }
 
     private async Task CargarEspecialidades()
@@ -148,7 +184,7 @@
 
         try
         {
-            var lista = await EspecialidadApi.ListarAsync(Nombre);
+            var lista = await EspecialidadesService.ListarAsync(Nombre);
 
             Especialidades = lista
                 .Select(x => new ItemEspecialidades(x.Id, x.Nombre))
@@ -166,6 +202,31 @@
         }
     }
 
+    private async Task CargarConsultorios()
+    {
+        CargandoConsultorios = true;
+        ErrorConsultorios = null;
+
+        try
+        {
+            var lista = await ConsultorioService.ListarAsync(Nombre);
+
+            Consultorios = lista
+                .Select(x => new ItemConsultorios(x.Id, x.Institucion))
+                .OrderBy(x => x.Nombre)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorConsultorios = ex.Message;
+            Consultorios = new();
+        }
+        finally
+        {
+            CargandoConsultorios = false;
+        }
+    }
+
     private async Task Create()
     {
         Error = null;
@@ -173,13 +234,18 @@
         var nombre = (Model.Nombre ?? "").Trim();
         if (string.IsNullOrWhiteSpace(nombre))
         {
-            Error = "Ingresá un Instituto.";
+            Error = "Ingresá un Nombre.";
             return;
         }
 
         if (Model.EspecialidadId <= 0)
         {
-            Error = "Seleccioná una ciudad.";
+            Error = "Seleccioná una Especialidad.";
+            return;
+        }
+        if (Model.ConsultoriosId <= 0)
+        {
+            Error = "Seleccioná una Institucion.";
             return;
         }
 
@@ -192,10 +258,11 @@
                 DNI = Model.DNI,
                 Nombre = Model.Nombre,
                 Apellido = Model.Apellido,
-                EspecialidadId = Model.EspecialidadId
+                EspecialidadId = Model.EspecialidadId,
+                ConsultorioId = Model.ConsultoriosId
             };
 
-            await Api.CrearAsync(req);
+            await MedicosService.CrearAsync(req);
             Nav.NavigateTo("/medicos");
         }
         catch (Exception ex)
@@ -214,8 +281,11 @@
         public string Nombre { get; set; } = "";
         public string Apellido { get; set; } = "";
         public int EspecialidadId { get; set; }
+        public int ConsultoriosId { get; set; }
     }
 
     private void Volver() => Nav.NavigateTo("/medicos");
     private record ItemEspecialidades(int Id, string Nombre);
+    private record ItemConsultorios(int Id, string Nombre);
+
 }

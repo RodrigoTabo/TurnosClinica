@@ -1,8 +1,10 @@
 ﻿@page "/pacientes/details/{Id:guid}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Pacientes
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Pacientes
-@inject PacientesApiClient PacientesApiClient
+@using TurnosClinica.Application.Services.Pacientes
+@inject IPacientesService PacientesService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -229,7 +231,7 @@
 
         try
         {
-            Paciente = await PacientesApiClient.GetByIdAsync(Id);
+            Paciente = await PacientesService.GetByIdAsync(Id);
 
             if (Paciente is not null)
             {
@@ -279,9 +281,9 @@
             if (string.IsNullOrWhiteSpace(Model.Nombre))
                 throw new InvalidOperationException("Ingresá un nombre.");
 
-            await PacientesApiClient.UpdateAsync(Id, Model);
+            await PacientesService.UpdateAsync(Id, Model);
 
-            Paciente = await PacientesApiClient.GetByIdAsync(Id);
+            Paciente = await PacientesService.GetByIdAsync(Id);
 
             if (Paciente is not null)
             {

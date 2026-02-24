@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TurnosClinica.Application.DTOs.Ciudades;
 using TurnosClinica.Application.Services.Ciudades;
+using TurnosClinica.Domain.Entities;
 
 namespace TurnosClinica.Controllers
 {
+    //[Authorize(Roles = Roles.Admin)]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CiudadesController : ControllerBase
@@ -15,6 +19,7 @@ namespace TurnosClinica.Controllers
         {
             _ciudadService = ciudadService;
         }
+
 
         [HttpGet]
         public async Task<ActionResult<List<CiudadResponse>>> Get(string? Nombre)

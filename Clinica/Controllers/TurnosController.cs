@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TurnosClinica.Application.DTOs.Turnos;
 using TurnosClinica.Application.Exceptions;
 using TurnosClinica.Application.Services.Turnos;
@@ -6,7 +7,7 @@ using TurnosClinica.Models;
 
 namespace TurnosClinica.Controllers
 {
-
+    [Authorize(Roles = "Admin, Recepcionista, Medico")]
     [ApiController]
     [Route("api/[controller]")]
     public class TurnosController : ControllerBase
@@ -60,6 +61,23 @@ namespace TurnosClinica.Controllers
         {
             await _service.SoftDeleteAsync(id);
             return NoContent();
+        }
+
+        [HttpPost("crear-asegurando-paciente")]
+        public async Task<ActionResult> Post([FromBody] CrearTurnoConPacienteRequest request)
+        {
+            var id = await _service.CrearAsegurandoPacienteAsync(request);
+            return Created($"/api/turnos/{id}", new { id });
+        }
+
+        [HttpGet("disponibles")]
+        public async Task<ActionResult<List<TimeSpan>>> GetDisponiblesAsync([FromQuery] int medicoId, [FromQuery] int consultorioId, [FromQuery] DateOnly fecha)
+        {
+            var horarios = await _service.ObtenerHorariosDisponiblesAsync(medicoId, consultorioId, fecha);
+
+            var result = horarios.Select(h => h.ToString("HH:mm")).ToList();
+
+            return Ok(result);
         }
 
 

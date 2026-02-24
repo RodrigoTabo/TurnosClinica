@@ -1,9 +1,12 @@
 ﻿@page "/provincias"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Provincias
 @using TurnosClinica.ApiClients.Provincias
-@inject ProvinciasApiClient Api
+@inject IProvinciasService provinciaService
+@attribute [Authorize(Roles = "Admin")]
 @using Microsoft.JSInterop
+@using TurnosClinica.Application.Services.Provincias
 @inject IJSRuntime JsRuntime
 
 <div class="admin-page">
@@ -141,7 +144,7 @@
 
     private async Task Limpiar()
     {
-        Nombre = "";
+        Nombre = null;
         await Cargar();
     }
 
@@ -154,7 +157,7 @@
 
         try
         {
-            Provincias = await Api.ListarAsync(Nombre);
+            Provincias = await provinciaService.ListarAsync(Nombre);
         }
         catch (Exception ex)
         {
@@ -170,9 +173,10 @@
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar la ciudad #{id}?"))
             return;
+        Error = null;
         try
         {
-            await Api.SoftDeleteAsync(id);
+            await provinciaService.SoftDeleteAsync(id);
             await Cargar();
         }
         catch (Exception ex)

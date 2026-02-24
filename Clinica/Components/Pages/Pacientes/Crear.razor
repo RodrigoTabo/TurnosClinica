@@ -1,8 +1,10 @@
 ﻿@page "/pacientes/crear"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Pacientes
-@using TurnosClinica.ApiClients.Pacientes
-@inject PacientesApiClient Api
+@using TurnosClinica.Application.Services.Pacientes
+@inject IPacientesService PacientesService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 
@@ -134,7 +136,7 @@
                 FechaNacimiento = Model.FechaNacimiento
             };
 
-            await Api.CrearAsync(req);
+            await PacientesService.CrearAsync(req);
             Nav.NavigateTo("/pacientes");
         }
         catch (Exception ex)

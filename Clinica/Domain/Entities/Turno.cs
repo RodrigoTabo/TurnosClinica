@@ -14,7 +14,13 @@
         public Consultorio Consultorio { get; set; }
         public Pago? Pago { get; set; }
         public DateOnly Fecha { get; set; }
-
         public DateTime? EliminadoEn { get; set; }
+
+        //Agregado para EmailSender.
+        public string? TokenConfirmacion { get; set; }
+        public DateTime? TokenConfirmacionExpiraEn { get; set; }
+        public DateTime? VerificadoEn { get; set; }
+
+
     }
 }

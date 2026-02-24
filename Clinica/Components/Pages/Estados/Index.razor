@@ -1,8 +1,10 @@
 ﻿@page "/estados"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Estados
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Estados
-@inject EstadosApiClient Api
+@using TurnosClinica.Application.Services.Estados
+@inject IEstadoService EstadoService
+@attribute [Authorize(Roles = "Admin")]
 @using Microsoft.JSInterop
 @inject IJSRuntime JsRuntime
 
@@ -137,11 +139,12 @@
     private List<EstadoResponse> Estados = new();
     private bool Cargando;
     private string? Error;
-    private string? Nombre = "";
+    private string? Nombre;
 
     private async Task Limpiar()
     {
-        Nombre = "";
+        Nombre = null;
+        Error = null;
         await Cargar();
     }
 
@@ -151,7 +154,7 @@
         Cargando = true;
         try
         {
-            Estados = await Api.ListarAsync(Nombre);
+            Estados = await EstadoService.ListarAsync(Nombre);
         }
         catch (Exception ex)
         {
@@ -167,9 +170,10 @@
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"¿Confirma que desea eliminar el estado #{id}?"))
             return;
+        Error = null;
         try
         {
-            await Api.SoftDeleteAsync(id);
+            await EstadoService.SoftDeleteAsync(id);
             await Cargar();
         }
         catch (Exception ex)

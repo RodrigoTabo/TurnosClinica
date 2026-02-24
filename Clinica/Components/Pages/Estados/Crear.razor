@@ -1,8 +1,10 @@
 ﻿@page "/estados/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Estados
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Estados
-@inject EstadosApiClient Api
+@using TurnosClinica.Application.Services.Estados
+@inject IEstadoService EstadoService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -92,7 +94,7 @@
             var nombre = (Model.Nombre ?? "").Trim();
             var req = new CrearEstadoRequest { Nombre = nombre };
 
-            await Api.CrearAsync(req);
+            await EstadoService.CrearAsync(req);
             Nav.NavigateTo("/estados");
 
         }

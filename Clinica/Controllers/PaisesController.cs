@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TurnosClinica.Application.DTOs.Paises;
 using TurnosClinica.Application.Services.Paises;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TurnosClinica.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class PaisesController : ControllerBase

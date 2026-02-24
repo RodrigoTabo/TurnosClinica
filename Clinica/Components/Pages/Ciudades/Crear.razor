@@ -1,12 +1,15 @@
 ﻿@page "/ciudades/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Ciudades
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Ciudades
-@using TurnosClinica.ApiClients.Provincias
 @using TurnosClinica.Application.DTOs.Provincias
-@inject CiudadesApiClient Api
-@inject ProvinciasApiClient ProvinciasApi
+@using TurnosClinica.Application.Services.Ciudades
+@using TurnosClinica.Application.Services.Provincias
+@using TurnosClinica.Domain.Entities
 @inject NavigationManager Nav
+@inject ICiudadService ciudadService
+@inject IProvinciasService provinciaService
+@attribute [Authorize(Roles = Roles.Admin)]
 
 
 <div class="admin-page">
@@ -135,7 +138,7 @@
 
         try
         {
-            var lista = await ProvinciasApi.ListarAsync(Nombre);
+            var lista = await provinciaService.ListarAsync(Nombre);
 
             Provincias = lista
                 .Select(x => new ItemProvincias(x.Id, x.Nombre))
@@ -187,7 +190,7 @@
                 ProvinciaId = Model.ProvinciaId
             };
 
-            await Api.CrearAsync(req);
+            await ciudadService.CrearAsync(req);
             Nav.NavigateTo("/ciudades");
         }
         catch (Exception ex)

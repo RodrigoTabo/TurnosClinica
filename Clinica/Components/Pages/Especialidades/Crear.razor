@@ -1,8 +1,10 @@
 ﻿@page "/especialidades/crear"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Especialidades
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Especialidades
-@inject EspecialidadesApiClient Api
+@using TurnosClinica.Application.Services.Especialidades
+@inject IEspecialidadesService EspecialidadService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -92,8 +94,8 @@
             var nombre = (Model.Nombre ?? "").Trim();
             var req = new CrearEspecialidadRequest { Nombre = nombre };
 
-            var id = await Api.CrearAsync(req);
-            Nav.NavigateTo($"/especialidades/{id}");
+            var id = await EspecialidadService.CreateAsync(req);
+            Nav.NavigateTo($"/especialidades/details/{id}");
         }
         catch (Exception ex)
         {

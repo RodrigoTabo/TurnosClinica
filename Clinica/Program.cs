@@ -11,8 +11,10 @@ using TurnosClinica.ApiClients.Pacientes;
 using TurnosClinica.ApiClients.Paises;
 using TurnosClinica.ApiClients.Provincias;
 using TurnosClinica.ApiClients.Turnos;
+using TurnosClinica.Application.DTOs.Email;
 using TurnosClinica.Application.Services.Ciudades;
 using TurnosClinica.Application.Services.Consultorios;
+using TurnosClinica.Application.Services.Email;
 using TurnosClinica.Application.Services.Especialidades;
 using TurnosClinica.Application.Services.Estados;
 using TurnosClinica.Application.Services.Medicos;
@@ -24,6 +26,7 @@ using TurnosClinica.Application.Services.Turnos;
 using TurnosClinica.Components;
 using TurnosClinica.Controllers;
 using TurnosClinica.Infrastructure.Data;
+using TurnosClinica.Infrastructure.Identity;
 
 
 
@@ -46,12 +49,6 @@ builder.Services.AddScoped<IConsultorioService, ConsultorioService>();
 builder.Services.AddScoped<IEstadoService, EstadoService>();
 builder.Services.AddScoped<IPacientesService, PacientesService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-
-
-
-
-
-
 
 
 
@@ -109,6 +106,10 @@ builder.Services.Configure<CookieAuthenticationOptions>(IdentityConstants.Applic
 });
 
 
+//Servicios de email
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCascadingAuthenticationState();
 
@@ -116,7 +117,10 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
 var app = builder.Build();
+
+await IdentitySeeder.SeedRolesAndUsersAsync(app.Services);
 
 if (!app.Environment.IsDevelopment())
 {

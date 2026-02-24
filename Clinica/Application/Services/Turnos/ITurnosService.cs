@@ -14,5 +14,14 @@ namespace TurnosClinica.Application.Services.Turnos
 
         Task SoftDeleteAsync(int Id);
 
+        Task<Guid> ObtenerOCrearPacientePorDniAsync(CrearTurnoConPacienteRequest request);
+
+        Task<int> CrearAsegurandoPacienteAsync(CrearTurnoConPacienteRequest request);
+
+        Task<(bool Ok, string Mensaje)> VerificarTurnoAsync(int turnoId, string token);
+        Task<List<TimeOnly>> ObtenerHorariosDisponiblesAsync(int medicoId, int consultorioId, DateOnly fecha);
+
+
+
     }
 }

@@ -1,10 +1,12 @@
 ﻿@page "/provincias/details/{Id:int}"
 @rendermode InteractiveServer
-@using TurnosClinica.ApiClients.Provincias
-@using TurnosClinica.ApiClients.Paises
+@using Microsoft.AspNetCore.Authorization
 @using TurnosClinica.Application.DTOs.Provincias
-@inject ProvinciasApiClient ProvinciasApiClient
-@inject PaisesApiClient PaisesApiClient
+@using TurnosClinica.Application.Services.Paises
+@using TurnosClinica.Application.Services.Provincias
+@inject IPaisesService PaisesService
+@inject IProvinciasService provinciaService
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
 <div class="admin-page">
@@ -178,7 +180,7 @@
 
         try
         {
-            Provincia = await ProvinciasApiClient.GetByIdAsync(Id);
+            Provincia = await provinciaService.GetByIdAsync(Id);
 
             if (Provincia is not null)
             {
@@ -207,7 +209,7 @@
 
         try
         {
-            var lista = await PaisesApiClient.ListarAsync(Nombre);
+            var lista = await PaisesService.ListarAsync(Nombre);
 
             Paises = lista
                 .Select(x => new ItemPaises(x.Id, x.Nombre))
@@ -255,9 +257,9 @@
             if (Model.PaisId <= 0)
                 throw new InvalidOperationException("Seleccioná un país.");
 
-            await ProvinciasApiClient.UpdateAsync(Id, Model);
+            await provinciaService.UpdateAsync(Id, Model);
 
-            Provincia = await ProvinciasApiClient.GetByIdAsync(Id);
+            Provincia = await provinciaService.GetByIdAsync(Id);
 
             if (Provincia is not null)
             {
