@@ -9,9 +9,11 @@ Permite administrar entidades principales (países, provincias, ciudades, consul
 ## 🚀 Estado del proyecto
 
 ### ✅ Versión actual: V1 (funcional)
+
 La V1 se encuentra enfocada en la **lógica de negocio**, validaciones y flujo completo de registro de turnos.
 
 ### 🔜 Próxima versión: V2 (en planificación / desarrollo)
+
 La V2 estará orientada a **mejoras visuales (UI/UX)**, experiencia de usuario y nuevas funcionalidades.
 
 ---
@@ -19,6 +21,7 @@ La V2 estará orientada a **mejoras visuales (UI/UX)**, experiencia de usuario y
 ## ✨ Funcionalidades implementadas (V1)
 
 ### 📌 Gestión de entidades
+
 - [x] ABM de Países
 - [x] ABM de Provincias
 - [x] ABM de Ciudades
@@ -30,6 +33,7 @@ La V2 estará orientada a **mejoras visuales (UI/UX)**, experiencia de usuario y
 - [x] ABM de Turnos
 
 ### 📅 Gestión de turnos
+
 - [x] Registro de turnos
 - [x] Validaciones de negocio para turnos
 - [x] Verificación de existencia de entidades relacionadas (paciente, médico, etc.)
@@ -37,17 +41,20 @@ La V2 estará orientada a **mejoras visuales (UI/UX)**, experiencia de usuario y
 - [x] Manejo de errores y respuestas HTTP adecuadas
 
 ### 🛡️ Validaciones / Reglas de negocio
+
 - [x] Validaciones de integridad en servicios
 - [x] Validaciones antes de persistir datos
 - [x] Soft delete (en todas las entidades)
-- [x] Prevención de duplicados 
+- [x] Prevención de duplicados
 
 ### 📧 Notificaciones por email
+
 - [x] Implementación de `IEmailSender`
 - [x] Envío de email al registrar turno
 - [x] Integración del servicio de email con el flujo de negocio
 
 ### 🖥️ UI / Frontend (V1)
+
 - [x] Pantallas funcionales para ABM
 - [x] Formularios de carga/edición
 - [x] Listados y navegación básica
@@ -58,16 +65,19 @@ La V2 estará orientada a **mejoras visuales (UI/UX)**, experiencia de usuario y
 ## 🧱 Arquitectura / Stack utilizado
 
 ### Backend / Lógica
+
 - **.NET / ASP.NET Core**
 - **Entity Framework Core**
 - **API REST**
 - **SQL Server**
 
 ### Frontend
+
 - **Blazor Web App**
 - **Bootstrap 5**
 
 ### Otros
+
 - **Identity**
 - **Servicio de Email (`IEmailSender`)**
 
@@ -76,6 +86,7 @@ La V2 estará orientada a **mejoras visuales (UI/UX)**, experiencia de usuario y
 ## ✅ Objetivo de la V1
 
 El objetivo principal de esta versión fue construir una base sólida de:
+
 - **lógica de negocio**
 - **validaciones**
 - **estructura del sistema**
@@ -90,6 +101,7 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
 > La idea de esta versión es mejorar experiencia de usuario, diseño visual y sumar funcionalidades nuevas.
 
 ### 🎨 UI/UX y diseño
+
 - [ ] Migrar UI actual a **MudBlazor**
 - [ ] Mejorar diseño general (layout, tarjetas, formularios, tablas)
 - [ ] Mejorar experiencia de usuario en creación de turnos
@@ -97,12 +109,14 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
 - [ ] Mejorar responsive para mobile/tablet
 
 ### 📊 Dashboard / Métricas
+
 - [ ] Dashboard con métricas principales
 - [ ] Cantidad de turnos por día/semana/mes
 - [ ] Turnos por médico / especialidad
 - [ ] Estados de turnos (pendiente, confirmado, cancelado, etc.)
 
 ### 👨‍⚕️ Funcionalidades nuevas (ideas)
+
 - [ ] Sistema de fichaje para empleados / médicos
 - [ ] Panel por rol (Recepción / Admin / Médico)
 - [ ] Mejoras de agenda / calendario
@@ -110,11 +124,13 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
 - [ ] Notificaciones adicionales por email
 
 ### 🔐 Seguridad / autenticación
+
 - [ ] Mejorar autenticación/autorización
 - [ ] Roles y permisos más detallados
 - [ ] Protección de vistas y endpoints por rol
 
 ### 🧪 Calidad / mantenimiento
+
 - [ ] Tests unitarios de servicios
 - [ ] Tests de integración para endpoints críticos
 - [ ] Refactor de componentes UI
@@ -124,19 +140,21 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
 ---
 
 ## 📸 Capturas
+
 > Podés agregar screenshots de la app acá cuando quieras mostrar UI.
 
 ### Home
+
 <p align="center">
-  <img src="docs/img/home.png" alt="Home" width="850" />
+  <img src="/Clinica/docs/docs/img/home.png" alt="Home" width="850" />
 </p>
 ### Gestion de medicos
 <p align="center">
-  <img src="docs/img/medicos.png" alt="Medicos" width="850" />
+  <img src="/Clinica/docs/img/medicos.png" alt="Medicos" width="850" />
 </p>
 ### Registro de turnos
 <p align="center">
-  <img src="docs/img/turnos.png" alt="Turnos" width="850" />
+  <img src="/Clinica/docs/img/turnos.png" alt="Turnos" width="850" />
 </p>
 
 ---
@@ -144,11 +162,13 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
 ## ⚙️ Cómo ejecutar el proyecto (local)
 
 ### Requisitos
+
 - .NET SDK (versión X)
 - SQL Server (si aplica)
 - Visual Studio / VS Code
 
 ### Pasos generales
+
 1. Clonar el repositorio
 2. Configurar cadena de conexión en `appsettings.json`
 3. Ejecutar migraciones (si aplica)
@@ -158,3 +178,4 @@ priorizando funcionalidad y consistencia antes que diseño avanzado.
 dotnet restore
 dotnet build
 dotnet run
+```
