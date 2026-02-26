@@ -27,11 +27,14 @@ using TurnosClinica.Components;
 using TurnosClinica.Controllers;
 using TurnosClinica.Infrastructure.Data;
 using TurnosClinica.Infrastructure.Identity;
+using MudBlazor.Services; // Agrego el servicio de MudBlazor
+
 
 
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddMudServices(); // MudBlazor
 
 builder.Services.AddControllers();
 
