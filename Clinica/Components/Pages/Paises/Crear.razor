@@ -7,77 +7,93 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager Nav
 
-<div class="admin-page">
-    <header class="admin-header">
-        <h2 class="admin-title">Países</h2>
-        <p class="admin-subtitle">Crear</p>
-    </header>
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-6">
 
-    <section class="admin-section">
-        <div class="paises-scope">
-            <div class="card border-0 shadow-sm pais-card">
-                <div class="card-header bg-white border-bottom p-4 pais-header">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                        <div>
-                            <h5 class="mb-1">Nuevo país</h5>
-                            <div class="text-muted small">Completá el nombre y guardá</div>
-                        </div>
+    <MudStack Spacing="1">
+        <MudText Typo="Typo.h4">Países</MudText>
+        <MudText Typo="Typo.subtitle2" Color="Color.Default">Administración</MudText>
+    </MudStack>
 
-                        <button type="button"
-                                class="btn btn-outline-secondary"
-                                @onclick="Volver"
-                                @onclick:stopPropagation="true"
-                                @onclick:preventDefault="true"
-                                disabled="@Guardando">
-                            <i class="bi bi-arrow-left"></i> Volver
-                        </button>
-                    </div>
+    <MudPaper Class="mt-4" Outlined="true" Elevation="0">
 
-                    @if (!string.IsNullOrWhiteSpace(Error))
-                    {
-                        <div class="alert alert-danger mt-3 mb-0">@Error</div>
-                    }
-                </div>
+        <!-- Toolbar -->
+        <MudToolBar Dense="true" Class="px-4 py-3">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">Nuevo país</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Default">Completá los datos y guardá</MudText>
+            </MudStack>
 
-                <div class="card-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label">Nombre</label>
-                        <input class="form-control"
-                               placeholder="Ej: Argentina"
-                               @bind-value="Model.Nombre"
-                               @bind-value:event="oninput"
-                               disabled="@Guardando" />
-                        <div class="form-hint">Debe ser único. Se recortan espacios al guardar.</div>
-                    </div>
-                </div>
+            <MudSpacer />
 
-                <div class="card-footer bg-white border-top p-4 d-flex gap-2 justify-content-end"
-                     @onclick="FooterClick">
+            <MudButton ButtonType="ButtonType.Button"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       OnClick="Volver"
+                       Disabled="@Guardando"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                Volver
+            </MudButton>
+        </MudToolBar>
 
-                    <button type="button"
-                            class="btn btn-outline-secondary"
-                            @onclick="Volver"
-                            @onclick:stopPropagation="true"
-                            @onclick:preventDefault="true"
-                            disabled="@Guardando">
-                        Cancelar
-                    </button>
+        <MudDivider />
 
-                    <button type="button"
-                            class="btn btn-manage"
-                            @onclick="Create"
-                            @onclick:stopPropagation="true"
-                            @onclick:preventDefault="true"
-                            disabled="@Guardando">
-                        <i class="bi bi-check2-circle"></i>
-                        @(Guardando ? "Guardando..." : "Crear")
-                    </button>
+        @if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mx-4 mt-4">
+                @Error
+            </MudAlert>
+        }
 
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
+        <MudStack Class="px-4 py-4" Spacing="2">
+            <MudGrid Spacing="2">
+                <MudItem xs="12" md="8">
+                    <MudTextField @bind-Value="Model.Nombre"
+                                  Label="Nombre"
+                                  Placeholder="Ej: Argentina..."
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Public"
+                                  Clearable="true"
+                                  Disabled="@Guardando"
+                                  FullWidth="true" />
+
+                    <MudText Typo="Typo.caption" Color="Color.Default">
+                        Debe ser único. Se recortan espacios al guardar.
+                    </MudText>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+
+        <MudDivider />
+
+        <MudStack Row="true"
+                  Justify="Justify.FlexEnd"
+                  AlignItems="AlignItems.Center"
+                  Spacing="2"
+                  Class="px-4 py-3">
+
+            <MudButton ButtonType="ButtonType.Button"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       OnClick="Volver"
+                       Disabled="@Guardando">
+                Cancelar
+            </MudButton>
+
+            <MudButton ButtonType="ButtonType.Button"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="Create"
+                       Disabled="@Guardando"
+                       StartIcon="@Icons.Material.Filled.CheckCircle">
+                @(Guardando ? "Guardando..." : "Crear")
+            </MudButton>
+
+        </MudStack>
+
+    </MudPaper>
+</MudContainer>
 
 @code {
     private string? Error;
